@@ -72,7 +72,7 @@ const funkcjeMenu=
 							svg:"",
 							link:"",
 							funkcja:"",
-							menu:"",
+							menu:"test1",
 							div:document.createElement("div"),
 						},
 						{
@@ -80,7 +80,7 @@ const funkcjeMenu=
 							svg:"",
 							link:"",
 							funkcja:"",
-							menu:"",
+							menu:"test2",
 							div:document.createElement("div"),
 						},
 						{
@@ -88,7 +88,7 @@ const funkcjeMenu=
 							svg:"",
 							link:"",
 							funkcja:"",
-							menu:"",
+							menu:"test3",
 							div:document.createElement("div"),
 						},
 						{
@@ -117,7 +117,7 @@ const funkcjeMenu=
 							svg:"",
 							link:"",
 							funkcja:"",
-							menu:"",
+							menu:"test4",
 							div:document.createElement("div"),
 						},
 						{
@@ -125,7 +125,7 @@ const funkcjeMenu=
 							svg:"",
 							link:"",
 							funkcja:"",
-							menu:"",
+							menu:"test5",
 							div:document.createElement("div"),
 						},
 						{
@@ -133,7 +133,7 @@ const funkcjeMenu=
 							svg:"",
 							link:"",
 							funkcja:"",
-							menu:"",
+							menu:"test6",
 							div:document.createElement("div"),
 						},
 					],
