@@ -1,0 +1,21 @@
+:root
+{
+	--podstawowy1: #4df707;
+	--podstawowy2: #43b111;
+	--podstawowy3: #397f11;
+	--podstawowyT1: rgba(77,247,7,0.7);
+	--podstawowyT2: rgba(77,247,7,0.5);
+	--podstawowyT3: rgba(77,247,7,0.3);
+	--zaznaczony1: #ff6107;
+	--zaznaczony2: #ff6107;
+	--zaznaczony3: #ff6107;
+	--zaznaczonyT1: rgba(255,97,7,0.7);
+	--zaznaczonyT2: rgba(255,97,7,0.5);
+	--zaznaczonyT3: rgba(255,97,7,0.3);
+	--tlo1: #071100;
+	--tlo2: #071100;
+	--tlo3: #071100;
+	--tloT1: rgba(7,17,0,0.7);
+	--tloT2: rgba(7,17,0,0.5);
+	--tloT3: rgba(7,17,0,0.3);
+}
