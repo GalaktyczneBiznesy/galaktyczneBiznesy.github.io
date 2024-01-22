@@ -145,14 +145,13 @@ const funkcjeMenu=
 			for (let i=0 ; i<2 ; i++)
 			{
 				const pas=document.getElementById("pas"+(i+1)).getElementsByClassName("kontentPas")[0]
-				pas.style.width="48vh"
-				pas.style.marginLeft="-24vh"
+				setTimeout(()=>{pas.style.width="48vh";pas.style.marginLeft="-24vh"},1000)
 				for (let j=0 ; j<4 ; j++)
 				{
 					const guzik=funkcjeMenu.guziki.ekrany.zero[i].guziki[j]
 					guzik.div.className="guzik"
-					setTimeout(()=>{pas.appendChild(guzik.div)},750)
-					setTimeout(()=>{funkcjeMenu.guziki.odswiez(guzik)},1000)
+					setTimeout(()=>{pas.appendChild(guzik.div)},1750)
+					setTimeout(()=>{funkcjeMenu.guziki.odswiez(guzik)},2000)
 				}
 			}
 		},
