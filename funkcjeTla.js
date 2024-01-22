@@ -43,13 +43,13 @@ const funkcjeTla=
 	[
 		function(g)
 		{
-			g.style.transition="4s"
+			g.style.transition="7s"
 			setTimeout(()=>{funkcjeTla.animacjegwiazd[1](g)},10)
 		},
 		function(g)
 		{
 			g.style.opacity=0.6
-			setTimeout(()=>{funkcjeTla.animacjegwiazd[2](g)},4200)
+			setTimeout(()=>{funkcjeTla.animacjegwiazd[2](g)},7200)
 		},
 		function(g)
 		{
@@ -73,13 +73,13 @@ const funkcjeTla=
 		},
 		function(g)
 		{
-			g.style.transition="4s"
+			g.style.transition="7s"
 			setTimeout(()=>{funkcjeTla.animacjegwiazd[7](g)},10)
 		},
 		function(g)
 		{
 			g.style.opacity=0
-			setTimeout(()=>{funkcjeTla.animacjegwiazd[0](g)},4200+(Math.random()*10000))
+			setTimeout(()=>{funkcjeTla.animacjegwiazd[0](g)},7200+(Math.random()*10000))
 		}
 	]
 }
