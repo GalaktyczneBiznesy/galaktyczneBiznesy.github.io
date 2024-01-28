@@ -1,26 +1,26 @@
-const funkcjeTla=
+const tlo=
 {
 	zaladuj:function()
 	{
-		const tlo=document.getElementById("tlo")
+		const tlo_div=document.getElementById("tlo")
 		const iloscGwiazd=77
 		for (let i=0 ; i<iloscGwiazd ; i++)
 		{
 			const gwiazda=document.createElement("div")
 			gwiazda.className="gwiazdaTla"
-			let p=funkcjeTla.losowaPozycja()
+			let p=tlo.losowaPozycja()
 			for (let a=0 ; a<3 ; a++)
 			{
 				const odl=Math.pow(Math.pow((50-p[0]),2)+Math.pow((50-p[1]),2),0.5)
 				if (Math.random()<Math.abs(odl-42)/20)
 				{
-					p=funkcjeTla.losowaPozycja()
+					p=tlo.losowaPozycja()
 				}
 			}
 			gwiazda.style.top=`${p[0]}%`
 			gwiazda.style.left=`${p[1]}%`
-			tlo.appendChild(gwiazda)
-			setTimeout(()=>{funkcjeTla.animacjegwiazd[0](gwiazda)},4200+(Math.random()*10000))
+			tlo_div.appendChild(gwiazda)
+			setTimeout(()=>{tlo.animacjegwiazd[0](gwiazda)},4200+(Math.random()*10000))
 		}
 	},
 	losowaPozycja:function()
@@ -44,42 +44,42 @@ const funkcjeTla=
 		function(g)
 		{
 			g.style.transition="7s"
-			setTimeout(()=>{funkcjeTla.animacjegwiazd[1](g)},10)
+			setTimeout(()=>{tlo.animacjegwiazd[1](g)},10)
 		},
 		function(g)
 		{
 			g.style.opacity=0.6
-			setTimeout(()=>{funkcjeTla.animacjegwiazd[2](g)},7200)
+			setTimeout(()=>{tlo.animacjegwiazd[2](g)},7200)
 		},
 		function(g)
 		{
 			g.style.transition="0.2s"
-			setTimeout(()=>{funkcjeTla.animacjegwiazd[3](g)},10)
+			setTimeout(()=>{tlo.animacjegwiazd[3](g)},10)
 		},
 		function(g)
 		{
 			g.style.opacity=1
-			setTimeout(()=>{funkcjeTla.animacjegwiazd[4](g)},220)
+			setTimeout(()=>{tlo.animacjegwiazd[4](g)},220)
 		},
 		function(g)
 		{
 			g.style.opacity=0.2
-			setTimeout(()=>{funkcjeTla.animacjegwiazd[5](g)},220)
+			setTimeout(()=>{tlo.animacjegwiazd[5](g)},220)
 		},
 		function(g)
 		{
 			g.style.opacity=0.6
-			setTimeout(()=>{funkcjeTla.animacjegwiazd[6](g)},220)
+			setTimeout(()=>{tlo.animacjegwiazd[6](g)},220)
 		},
 		function(g)
 		{
 			g.style.transition="7s"
-			setTimeout(()=>{funkcjeTla.animacjegwiazd[7](g)},10)
+			setTimeout(()=>{tlo.animacjegwiazd[7](g)},10)
 		},
 		function(g)
 		{
 			g.style.opacity=0
-			setTimeout(()=>{funkcjeTla.animacjegwiazd[0](g)},7200+(Math.random()*10000))
+			setTimeout(()=>{tlo.animacjegwiazd[0](g)},7200+(Math.random()*10000))
 		}
 	]
 }
