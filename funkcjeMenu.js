@@ -9,6 +9,7 @@ const menu=
 			menu.guziki[i]=[]
 			const pas=document.getElementById("pas"+(i+1)).getElementsByClassName("kontentPas")[0]
 			setTimeout(()=>{pas.style.width="48vh";pas.style.marginLeft="-24vh"},500)
+			alert("test")
 			for (let j=0 ; j<4 ; j++)
 			{
 				menu.guziki[i][j] = new Guzik({aktywny:false})
