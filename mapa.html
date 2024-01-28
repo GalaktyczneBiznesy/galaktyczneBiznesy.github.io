@@ -12,8 +12,9 @@
 <script type="text/javascript">
 	function start()
 	{
-		funkcjeTla.zaladuj()
-		funkcjeMenu.guziki.start()
+		tlo.zaladuj()
+		menu.zaladuj()
+		setTimeout(()=>{menu.guziki[0][2].odswiez({aktywny:1,menu:'test',zaznaczony:1})},4000)
 	}
 </script>
 </head>
