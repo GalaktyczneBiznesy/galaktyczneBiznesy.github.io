@@ -8,20 +8,8 @@
 	body
 	{
 		background: black;
-	}
-	.element
-	{
-		margin: 0.5vh;
-		margin-left: 0.2vh;
-		margin-right: 0.1vh;
-		padding: 0.5vh;
 		color: white;
-		font-size: 1.7vh;
-		border: solid 0.2vh white;
-	}
-	.napis
-	{
-		padding: 0.7vh;
+		font-size: 1.5vh;
 	}
 </style>
 <script type="text/javascript">
@@ -82,7 +70,9 @@
 							]
 						},
 						{typ:"number",nazwa:"właściciel"},
+						{typ:"tablica",nazwa:"plusy",elementy:{typ:"number",zakres:[0,9]},opis:"lista identyfikatorów graczy którzy polubili biznes"},
 						{typ:"tablica",nazwa:"zasoby",elementy:{typ:"number",zakres:[0,9]},opis:"lista prędkości wydobycia danego numeru surowca lub 0 kiedy nie ma"},
+						{typ:"bolean",nazwa:"czy miejsca parkingowe rozciągalne",opis:"orbita była by biznesem i potrzebuje rozciągalnego parkingu"},
 						{
 							typ:"tablica",
 							nazwa:"parking",
@@ -128,7 +118,7 @@
 						{typ:"string",nazwa:"data utworzenia konta"},
 						{typ:"string",nazwa:"hasło"},
 						{typ:"number",nazwa:"typ",opis:"gracz/moderator/admin itp"},
-						{typ:"number",nazwa:"czy aktywny",zakres:[0,1]},
+						{typ:"bolean",nazwa:"czy aktywny"},
 						{typ:"number",nazwa:"id statku"},
 						{typ:"number",nazwa:"ilość podróży"},
 						{typ:"number",nazwa:"przebyty dystans"},
@@ -162,7 +152,7 @@
 								[
 									{typ:"string",nazwa:"treść"},
 									{typ:"string",nazwa:"treść skrócona"},
-									{typ:"number",nazwa:"czy odczytana",zakres:[0,1]},
+									{typ:"bolean",nazwa:"czy odczytana"},
 									{typ:"number",nazwa:"identyfikator"},
 								]
 							}
@@ -177,7 +167,7 @@
 								[
 									{typ:"string",nazwa:"treść"},
 									{typ:"string",nazwa:"autor"},
-									{typ:"number",nazwa:"czy odczytana",zakres:[0,1]},
+									{typ:"bolean",nazwa:"czy odczytana"},
 									{typ:"number",nazwa:"identyfikator"},
 								]
 							}
@@ -192,7 +182,7 @@
 								elementy:
 								[
 									{typ:"string",nazwa:"treść"},
-									{typ:"number",nazwa:"czy odczytana",zakres:[0,1]},
+									{typ:"bolean",nazwa:"czy odczytana"},
 									{typ:"number",nazwa:"identyfikator"},
 								]
 							}
@@ -322,8 +312,9 @@
 							{nazwa:"cena",typ:"number"},
 							{nazwa:"typ surowca",typ:"number",opis:"identyfikator surowca"},
 							{nazwa:"ilość surowca",typ:"number"},
-							{nazwa:"nr pojemnika",typ:"number",opis:"nr pojemnika z którego nastąpi pobranie u wystawcy"},
-							{nazwa:"czy transakcja na użytek",typ:"number",zakres:[0,1],opis:"np w przypadku zakupu statku"},
+							{nazwa:"nr pojemnika",typ:"number",opis:"jeżeli sprzedaż dotyczy towaru liczonego na sztuki"},
+							{nazwa:"nr miejsca w pojemniku",typ:"number",opis:"nr miejsca w pojemniku w którym jest przedmiot sprzedaży"},
+							{nazwa:"czy transakcja na użytek",typ:"bolean",opis:"np w przypadku zakupu statku"},
 						]
 					},
 					{
@@ -335,8 +326,9 @@
 							{nazwa:"cena",typ:"number"},
 							{nazwa:"typ surowca",typ:"number",opis:"identyfikator surowca"},
 							{nazwa:"ilość surowca",typ:"number"},
-							{nazwa:"nr pojemnika",typ:"number",opis:"nr pojemnika do którego nastąpi włożenie u wystawcy"},
-							{nazwa:"czy transakcja na użytek",typ:"number",zakres:[0,1],opis:"np w przypadku zakupu statku"},
+							{nazwa:"nr pojemnika",typ:"number",opis:"jeżeli sprzedaż dotyczy towaru liczonego na sztuki"},
+							{nazwa:"nr miejsca w pojemniku",typ:"number",opis:"nr miejsca w pojemniku w którym ma się znaleźć zakupiony przedmiot"},
+							{nazwa:"czy transakcja na użytek",typ:"bolean",opis:"np w przypadku zakupu statku"},
 						]
 					},
 				]
@@ -357,7 +349,7 @@
 						{nazwa:"miejsce znalezienia",typ:"tekst"},
 						{nazwa:"treść",typ:"tekst"},
 						{nazwa:"autor",typ:"number"},
-						{nazwa:"czy widoczny autor",typ:"number",zakres:[0,1]},
+						{nazwa:"czy widoczny autor",typ:"bolean"},
 					]
 				},
 			],
@@ -373,42 +365,38 @@
 	function schemat(dane)
 	{
 		const element=document.createElement("div")
-		element.className="element"
 		dane.typ=(dane.typ||"").toUpperCase()||""
 		if (dane.typ=="ARRAY" || dane.typ=="TABLICA")
 		{
-			if (dane.nazwa)
-			{
-				element.appendChild(napis(`tablica o nazwie <b>${dane.nazwa||""}</b>`,"#f74d4d"))
-			}
-			else
-			{
-				element.appendChild(napis(`tablica`,"#f74d4d"))
-			}
-			if (dane.opis)
-			{
-				element.appendChild(napis(dane.opis,"gray"))
-			}
+			const t=[["[","#f74d4d"],[dane.nazwa||"..."],["]","#f74d4d"]]
 			if (Number(dane.dlugosc))
 			{
-				element.appendChild(napis(`długość <b>${dane.dlugosc||""}</b>`))
+				t.push(["&nbsp;&nbsp;"])
+				t.push([`L: ${dane.dlugosc}`])
 			}
 			else
 			{
-				if (Number(dane.dlugoscMax))
-				{
-					element.appendChild(napis(`maksymalna długość: <b>${dane.dlugoscMax||""}</b>`))
-				}
 				if (Number(dane.dlugoscMin))
 				{
-					element.appendChild(napis(`minimalna długość: <b>${dane.dlugoscMin||""}</b>`))
+					t.push(["&nbsp;&nbsp;"])
+					t.push([`L-min: ${dane.dlugoscMin}`])
 				}
+				if (Number(dane.dlugoscMax))
+				{
+					t.push(["&nbsp;&nbsp;"])
+					t.push([`L-max: ${dane.dlugoscMax}`])
+				}
+			}
+			element.appendChild(linijka(t))
+			if (dane.opis)
+			{
+				element.appendChild(linijka([[dane.opis,"#7f7f7f"]]))
 			}
 			if (dane.elementy)
 			{
-				element.appendChild(napis(`zawiera elementy:`))
+				element.appendChild(linijka([["każdy element:"]]))
 				const e=document.createElement("div")
-				e.style.marginLeft="2vh"
+				e.style.marginLeft="1.5vh"
 				element.appendChild(e)
 				if (!Array.isArray(dane.elementy))
 				{
@@ -419,30 +407,24 @@
 					e.appendChild(schemat(dane.elementy[a]))
 					if (a<dane.elementy.length-1)
 					{
-						e.appendChild(napis(`lub`))
+						element.appendChild(linijka([["lub"]]))
 					}
 				}
 			}
 		}
 		else if (dane.typ=="OBJECT" || dane.typ=="OBIEKT")
 		{
-			if (dane.nazwa)
-			{
-				element.appendChild(napis(`obiekt (słownik) o nazwie <b>${dane.nazwa||""}</b>`,"#93f74d"))
-			}
-			else
-			{
-				element.appendChild(napis(`obiekt (słownik)`,"#93f74d"))
-			}
+			const t=[["{","#93f74d"],[dane.nazwa||"..."],["}","#93f74d"]]
+			element.appendChild(linijka(t))
 			if (dane.opis)
 			{
-				element.appendChild(napis(dane.opis,"gray"))
+				element.appendChild(linijka([[dane.opis,"#7f7f7f"]]))
 			}
 			if (dane.elementy)
 			{
-				element.appendChild(napis(`zawiera elementy:`))
+				element.appendChild(linijka([["elementy:"]]))
 				const e=document.createElement("div")
-				e.style.marginLeft="2vh"
+				e.style.marginLeft="1.5vh"
 				element.appendChild(e)
 				if (!Array.isArray(dane.elementy))
 				{
@@ -456,123 +438,106 @@
 		}
 		else if (dane.typ=="NUMBER" || dane.typ=="LICZBA")
 		{
+			const t=[["Number(","#4d9df7"],[dane.nazwa||"..."],[")","#4d9df7"]]
 			if (dane.wartosc && typeof dane.wartosc!="object")
 			{
-				if (dane.nazwa)
-				{
-					element.appendChild(napis(`wartość <b>${dane.wartosc}</b> liczbowa o nazwie <b>${dane.nazwa||""}</b>`,"#4d9df7"))
-				}
-				else
-				{
-					element.appendChild(napis(`wartość <b>${dane.wartosc}</b> liczbowa`,"#4d9df7"))
-				}
-			}
-			else
-			{
-				if (dane.nazwa)
-				{
-					element.appendChild(napis(`wartość liczbowa o nazwie <b>${dane.nazwa||""}</b>`,"#4d9df7"))
-				}
-				else
-				{
-					element.appendChild(napis(`wartość liczbowa`,"#4d9df7"))
-				}
-			}
-			if (dane.opis)
-			{
-				element.appendChild(napis(dane.opis,"gray"))
+				t.push(["&nbsp;&nbsp;"])
+				t.push([`W: ${dane.wartosc}`])
 			}
 			if (Array.isArray(dane.zakres))
 			{
-				element.appendChild(napis(`wartości w przedziale od <b>${dane.zakres[0]}</b> do <b>${dane.zakres[1]}</b>`))
+				t.push(["&nbsp;&nbsp;"])
+				t.push([`W: ${dane.zakres[0]}-${dane.zakres[1]}`])
 			}
 			if (Array.isArray(dane.wartosc))
 			{
-				element.appendChild(napis(`przyjmuje wartości:`))
-				const e=document.createElement("div")
-				e.style.marginLeft="2vh"
-				element.appendChild(e)
+				t.push(["&nbsp;&nbsp;"])
+				t.push([`W: `])
 				for (let a=0 ; a<dane.wartosc.length ; a++)
 				{
-					e.appendChild(napis(dane.wartosc[a]))
-					if (a<dane.wartosc.length-1)
-					{
-						e.appendChild(napis(`lub`))
-					}
+					t.push([`${dane.wartosc[a]}, `])
 				}
+			}
+			element.appendChild(linijka(t))
+			if (dane.opis)
+			{
+				element.appendChild(linijka([["&nbsp; "+dane.opis,"#7f7f7f"]]))
+			}
+		}
+		else if (dane.typ=="BOLEAN" || dane.typ=="LOGICZNA")
+		{
+			const t=[["if(","#f74d9d"],[dane.nazwa||"..."],[")","#f74d9d"]]
+			element.appendChild(linijka(t))
+			if (dane.opis)
+			{
+				element.appendChild(linijka([["&nbsp; "+dane.opis,"#7f7f7f"]]))
 			}
 		}
 		else if (dane.typ=="STRING" || dane.typ=="TEKST" || dane.typ=="TXT")
 		{
+			const t=[[`"`,"#f7d94d"],[dane.nazwa||"..."],[`"`,"#f7d94d"]]
 			if (dane.wartosc && typeof dane.wartosc!="object")
 			{
-				if (dane.nazwa)
-				{
-					element.appendChild(napis(`tekst <b>${dane.wartosc}</b> o nazwie <b>${dane.nazwa||""}</b>`,"#f7d94d"))
-				}
-				else
-				{
-					element.appendChild(napis(`tekst <b>${dane.wartosc}</b>`,"#f7d94d"))
-				}
-			}
-			else
-			{
-				if (dane.nazwa)
-				{
-					element.appendChild(napis(`tekst o nazwie <b>${dane.nazwa||""}</b>`,"#f7d94d"))
-				}
-				else
-				{
-					element.appendChild(napis(`tekst`,"#f7d94d"))
-				}
-			}
-			if (dane.opis)
-			{
-				element.appendChild(napis(dane.opis,"gray"))
+				t.push(["&nbsp;&nbsp;"])
+				t.push([`W: ${dane.wartosc}`])
 			}
 			if (Number(dane.dlugosc))
 			{
-				element.appendChild(napis(`długość <b>${dane.dlugosc||""}</b>`))
+				t.push(["&nbsp;&nbsp;"])
+				t.push([`L: ${dane.dlugosc}`])
 			}
 			else
 			{
-				if (Number(dane.dlugosc))
+				if (Number(dane.dlugoscMin))
 				{
-					element.appendChild(napis(`maksymalna długość <b>${dane.dlugosc||""}</b>`))
+					t.push(["&nbsp;&nbsp;"])
+					t.push([`L-min: ${dane.dlugoscMin}`])
 				}
-				else if (Number(dane.dlugosc))
+				if (Number(dane.dlugoscMax))
 				{
-					element.appendChild(napis(`minimalna długość <b>${dane.dlugosc||""}</b>`))
+					t.push(["&nbsp;&nbsp;"])
+					t.push([`L-max: ${dane.dlugoscMax}`])
 				}
 			}
 			if (Array.isArray(dane.wartosc))
 			{
-				element.appendChild(napis(`przyjmuje wartości:`))
-				const e=document.createElement("div")
-				e.style.marginLeft="2vh"
-				element.appendChild(e)
+				t.push(["&nbsp;&nbsp;"])
+				t.push([`W: `])
 				for (let a=0 ; a<dane.wartosc.length ; a++)
 				{
-					e.appendChild(napis(dane.wartosc[a]))
-					if (a<dane.wartosc.length-1)
-					{
-						e.appendChild(napis(`lub`))
-					}
+					t.push([`"${dane.wartosc[a]}", `])
 				}
+			}
+			element.appendChild(linijka(t))
+			if (dane.opis)
+			{
+				element.appendChild(linijka([["&nbsp; "+dane.opis,"#7f7f7f"]]))
 			}
 		}
 		else
 		{
-			element.appendChild(napis(`nic`))
+			element.appendChild(linijka(["nic","#7f7f7f"]))
 		}
 		return element
 	}
-	function napis(tekst,kolor)
+	function linijka(dane)
 	{
+		let s=""
+		for (let a=0 ; a<dane.length ; a++)
+		{
+			let t=dane[a][0]
+			if (dane[a][2])
+			{
+				t=`<b>${t}</b>`
+			}
+			if (dane[a][1])
+			{
+				t=`<span style="color:${dane[a][1]};">${t}</span>`
+			}
+			s+=t
+		}
 		const element=document.createElement("div")
-		element.className="napis"
-		element.innerHTML=tekst
-		element.style.color=kolor||"white"
+		element.innerHTML=s
 		return element
 	}
 </script>
