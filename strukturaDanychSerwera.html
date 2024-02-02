@@ -34,6 +34,7 @@
 								{typ:"string",nazwa:"nazwa"},
 								{typ:"number",nazwa:"kolor",zakres:[0,9],opis:"kolor w systemie może być liczbą a dopiero u klienta będzie rozróżnienie na kolory słońca i dany nr koloru"},
 								{typ:"number",nazwa:"wielkość",zakres:[0,9]},
+								{typ:"number",nazwa:"ilość odwiedzin"},
 								{typ:"string",nazwa:"data obecności ostatniego użytkownika"},
 								{typ:"string",nazwa:"data odkrycia"},
 								{typ:"number",nazwa:"przesuniecie",opis:"do złudzenia losowości ułożenia układów"},
@@ -43,6 +44,9 @@
 						}
 					]
 				},
+				{
+					//
+				}
 			],
 		},
 		{
@@ -57,6 +61,7 @@
 					elementy:
 					[
 						{typ:"string",nazwa:"nazwa"},
+						{typ:"string",nazwa:"kolor"},
 						{typ:"number",nazwa:"typ biznesu",opis:"identyfikator według którego ustalane są dokładne parametry"},
 						{typ:"string",nazwa:"data budowy"},
 						{
@@ -66,6 +71,7 @@
 							elementy:
 							[
 								{typ:"number",nazwa:"typ",zakres:[0,9]},
+								{typ:"number",nazwa:"nadane przez"},
 								{typ:"string",nazwa:"data nadania"},
 							]
 						},
@@ -219,6 +225,7 @@
 					{typ:"tekst",nazwa:"data produkcji"},
 					{typ:"tekst",nazwa:"data utylizacji"},
 					{typ:"tekst",nazwa:"nazwa fabryki"},
+					{typ:"tekst",nazwa:"kolor"},
 					{typ:"tablica",nazwa:"właściciele",elementy:{typ:"number",opis:"identyfikatory graczy"}},
 					{typ:"number",nazwa:"ilość podróży"},
 					{typ:"number",nazwa:"przebyty dystans"},
@@ -407,7 +414,7 @@
 					e.appendChild(schemat(dane.elementy[a]))
 					if (a<dane.elementy.length-1)
 					{
-						element.appendChild(linijka([["lub"]]))
+						e.appendChild(linijka([["lub"]]))
 					}
 				}
 			}
@@ -516,7 +523,7 @@
 		}
 		else
 		{
-			element.appendChild(linijka(["nic","#7f7f7f"]))
+			element.appendChild(linijka([["nic","#7f7f7f"]]))
 		}
 		return element
 	}
