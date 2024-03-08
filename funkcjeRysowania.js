@@ -27,11 +27,11 @@ function rysuj(plutno,budowaObrazka)
 			if (!Array.isArray(srodek) || !Number(promien)){return}
 			if (Array.isArray(zakresKatow))
 			{
-				ctx.arc(srodek[0], srodek[1], promien, zakresKatow[0]*Math.PI, zakresKatow[1]*Math.PI);
+				ctx.arc(srodek[1], srodek[0], promien, zakresKatow[0]*Math.PI, zakresKatow[1]*Math.PI);
 			}
 			else
 			{
-				ctx.arc(srodek[0], srodek[1], promien, 0, 1*Math.PI);
+				ctx.arc(srodek[1], srodek[0], promien, 0, 2*Math.PI);
 			}
 		}
 		if (kolor)
