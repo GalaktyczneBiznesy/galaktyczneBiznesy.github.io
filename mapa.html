@@ -5,24 +5,119 @@
 <meta charset="utf-8" />
 <link rel="stylesheet" href="globalne.css">
 <link rel="stylesheet" href="kolory.css">
+<link rel="stylesheet" href="mapa.css">
 <script src="funkcjeTla.js"></script>
 <script src="funkcjeMenu.js"></script>
-<style type="text/css">
-</style>
+<script src="funkcjeRysowania.js"></script>
 <script type="text/javascript">
 	function start()
 	{
 		tlo.zaladuj()
 		menu.zaladuj()
+		document.getElementById("kontent").appendChild(ekran.mapa.div)
+		document.getElementById("kontent").appendChild(ekran.uklad.div)
 		setTimeout(()=>{menu.guziki[0][2].odswiez({aktywny:1,menu:'test',zaznaczony:1})},4000)
+		//
+		test(ekran.mapa)
+		test(ekran.uklad)
+	}
+	class Ekran
+	{
+	    constructor(nazwa)
+	    {
+	    	this.obraz={d:1000,h:1000,elementy:[{typ:0,kolor:"#f7391b",srodek:[550,450],promien:400,zakresKatow:[0.2,1.22],grubosc:27,kolorLini:"#074d00"}]}//do testów
+	    	this.stan=0
+	    	this.div=document.createElement("div")
+	    	this.div.className="ekran"
+	    	this.div.id=`ekran-${nazwa}`
+	    	//
+	    	this.narozniki=[]
+	    	for (let i=0 ; i<4 ; i++)
+	    	{
+	    		const naroznik={}
+	    		naroznik.div=document.createElement("div")
+	    		naroznik.div.style.position="absolute"
+	    		naroznik.div.style.transition="0.5s"
+	    		naroznik.div.style.width="15%"
+	    		naroznik.div.style.height="15%"
+	    		naroznik.strony=[]
+	    		naroznik.strony.push(`${["Left","Right"][i%2]}`)
+	    		naroznik.strony.push(`${["Top","Bottom"][Math.floor(i/2)]}`)
+	    		for (const strona of naroznik.strony)
+	    		{
+	    			naroznik.div.style[`border${strona}`]=`solid 0.5vh var(--podstawowy1)`
+	    		}
+	    		for (const strona of naroznik.strony)
+	    		{
+	    			naroznik.div.style[strona.toLowerCase()]=[`42%`,"-0.7%"][this.stan]
+	    		}
+	    		this.narozniki.push(naroznik)
+	    		this.div.appendChild(naroznik.div)
+	    	}
+	    	this.canvas=document.createElement("canvas")
+	    	this.canvas.style.transition="0.3s"
+			this.canvas.className="ekran-canvas"
+			this.canvas.id=`${nazwa}-canvas`
+			this.canvas.style.opacity=this.stan
+			this.div.appendChild(this.canvas)
+	    }
+	    zamknij()
+	    {
+	    	this.stan=0
+	    	this.dopasujStan()
+	    }
+	    otworz()
+	    {
+	    	this.stan=1
+	    	this.dopasujStan()
+	    }
+	    dopasujStan()
+	    {
+	    	setTimeout(()=>{this.canvas.style.opacity=this.stan},[1,150][this.stan])
+	    	if (this.stan)
+	    	{
+	    		rysuj(this.canvas,this.obraz)
+	    	}
+	    	for (const naroznik of this.narozniki)
+	    	{
+	    		for (const strona of naroznik.strony)
+	    		{
+	    			setTimeout(()=>{naroznik.div.style[strona.toLowerCase()]=[`42%`,"-0.7%"][this.stan]},[100,1][this.stan])
+	    		}
+	    	}
+	    }
+	    odswiez()
+	    {
+	    	this.zamknij()
+	    	setTimeout(()=>{this.otworz()},600)
+	    }
+	}
+	const ekran=
+	{
+		mapa: new Ekran("mapa"),
+		uklad: new Ekran("uklad"),
+	}
+	function test(element)
+	{
+		if (Math.random()<0.7)
+		{
+			element.odswiez()
+			return setTimeout(()=>{test(element)},2500)
+		}
+		else
+		{
+			element.zamknij()
+			setTimeout(()=>{element.otworz()},2000)
+			return setTimeout(()=>{test(element)},4000)
+		}
 	}
 </script>
 </head>
 <body onload="start()">
-	<div class="pas" id="pas1"><div class="kontentPas"></div></div></div>
 	<div id="tlo"></div>
 	<div id="kontent"></div>
 	<div id="sztucznaStopka"></div>
+	<div class="pas" id="pas1"><div class="kontentPas"></div></div></div>
 	<div class="pas" id="pas2"><div class="kontentPas"></div></div></div>
 	<div id="oknoMenu"><div id="tloMenu"></div><div id="ramyMenu"><div id="ramaMenu1"></div><div id="ramaMenu2"></div></div><div id="kontentMenu"></div></div>
 </body>
