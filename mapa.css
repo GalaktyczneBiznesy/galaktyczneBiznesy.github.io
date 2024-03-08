@@ -1,0 +1,56 @@
+@media screen and (max-width: 139.99vh)
+{
+	.ekran
+	{
+		position: relative;
+		left: 50%;
+		width: 44vh;
+		height: 44vh;
+		margin-bottom: 3vh;
+	}
+	.ekran-canvas
+	{
+		position: absolute;
+		top: 0.5vh;
+		left: 0.5vh;
+		width: 43vh;
+		height: 43vh;
+		background: green;
+	}
+	#ekran-mapa
+	{
+		margin-left: -22vh;
+	}
+	#ekran-uklad
+	{
+		margin-left: -22vh;
+	}
+}
+@media screen and (min-width: 140vh)
+{
+	.ekran
+	{
+		position: absolute;
+		top: 7vh;
+		left: 50%;
+		width: 62vh;
+		height: 62vh;
+	}
+	.ekran-canvas
+	{
+		position: absolute;
+		top: 0.5vh;
+		left: 0.5vh;
+		width: 61vh;
+		height: 61vh;
+		background: green;
+	}
+	#ekran-mapa
+	{
+		margin-left: -63vh
+	}
+	#ekran-uklad
+	{
+		margin-left: 1vh
+	}
+}
