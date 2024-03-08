@@ -37,7 +37,8 @@ body
 {
 	position: relative;
 	top: 12vh;
-	left: 5vw;
+	left: 50%;
+	margin-left: -45vw;
 	width: 90vw;
 	min-height: 77vh;
 }
@@ -51,8 +52,8 @@ body
 .gwiazdaTla
 {
 	position: absolute;
-	width: 0.3vh;
-	height: 0.3vh;
+	width: 4px;
+	height: 4px;
 	background: white;
 	opacity: 0;
 }
@@ -60,7 +61,7 @@ body
 {
 	position: absolute;
 	width: 49vh;
-	min-height: 80vh;
+	min-height: 70vh;
 	top: 10vh;
 	left: 50%;
 	margin-left: -24.4vh;
@@ -71,7 +72,7 @@ body
 	box-sizing: border-box;
 	position: absolute;
 	width: 46vh;
-	height: 77vh;
+	height: 67vh;
 	top: 1.5vh;
 	left: 1.5vh;
 	background: black;
@@ -84,7 +85,7 @@ body
 {
 	position: absolute;
 	width: 45vh;
-	height: 76vh;
+	height: 66vh;
 	top: 2vh;
 	left: 2vh;
 	opacity: 0;
@@ -94,7 +95,7 @@ body
 {
 	position: absolute;
 	width: 49vh;
-	height: 80vh;
+	height: 70vh;
 	opacity: 0;
 	transition: 0.2s;
 }
@@ -150,7 +151,7 @@ body
 	border-top: solid 0.5vh var(--podstawowy3);
 	border-bottom: solid 0.5vh var(--podstawowy3);
 	opacity: 0.8;
-	transition: 0.1s;
+	transition: 0.2s;
 }
 .guzik:hover
 {
