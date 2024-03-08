@@ -10,6 +10,9 @@
 <script src="funkcjeMenu.js"></script>
 <script src="funkcjeRysowania.js"></script>
 <script type="text/javascript">
+	const polozenie=[[350,350]]
+	let widoczneUklady=[]
+	let zapisaneUklady=[]
 	function start()
 	{
 		tlo.zaladuj()
@@ -17,15 +20,13 @@
 		document.getElementById("kontent").appendChild(ekran.mapa.div)
 		document.getElementById("kontent").appendChild(ekran.uklad.div)
 		setTimeout(()=>{menu.guziki[0][2].odswiez({aktywny:1,menu:'test',zaznaczony:1})},4000)
-		//
-		test(ekran.mapa)
-		test(ekran.uklad)
+		setTimeout(()=>{zaznaczUklad(352,352)},2000)
 	}
 	class Ekran
 	{
 	    constructor(nazwa)
 	    {
-	    	this.obraz={d:1000,h:1000,elementy:[{typ:0,kolor:"#f7391b",srodek:[550,450],promien:400,zakresKatow:[0.2,1.22],grubosc:27,kolorLini:"#074d00"}]}//do testów
+	    	this.obraz={d:1000,h:1000,elementy:[{typ:0,kolor:"#f7391b",srodek:[550,450],promien:400,zakresKatow:[0.2,1.22],grubosc:27,kolorLini:"green"}]}//do testów
 	    	this.stan=0
 	    	this.div=document.createElement("div")
 	    	this.div.className="ekran"
@@ -97,19 +98,68 @@
 		mapa: new Ekran("mapa"),
 		uklad: new Ekran("uklad"),
 	}
-	function test(element)
+	function zaznaczUklad(y,x)
 	{
-		if (Math.random()<0.7)
+		polozenie.unshift([y,x])
+		ekran.mapa.zamknij()
+		pokazMape()
+	}
+	function pokazMape()
+	{
+		widoczneUklady=[]
+		for (let y=0 ; y<5 ; y++)
 		{
-			element.odswiez()
-			return setTimeout(()=>{test(element)},2500)
+			for (let x=0 ; x<5 ; x++)
+			{
+				const Y=polozenie[0][0]-2+y
+				const X=polozenie[0][1]-2+x
+				const uklad=szukajUkladu(Y,X)
+				if (uklad)
+				{
+					uklad.Ywidok=(70+(140*y))+([0,-40,-40,-40,0,0,0,40,40,40,0][uklad.przesuniecie]||0)+[-10,0,10,0,10,-10,0][((Y+X)%6)]
+					uklad.Xwidok=(70+(140*x))+([0,-40,0,40,-40,0,40,-40,0,40,0][uklad.przesuniecie]||0)+[0,10,-10,-10,0,10,0][((Y+X)%6)]
+					widoczneUklady.push(uklad)
+				}
+				else
+				{
+					return setTimeout(pokazMape,500)
+				}
+			}
 		}
-		else
+		const elementy=[]
+		elementy.push({typ:1,punkty:[[14,686],[686,686],[686,14],[14,14]],grubosc:27,kolorLini:"#253911",krycie:0.2})
+		if (true)
 		{
-			element.zamknij()
-			setTimeout(()=>{element.otworz()},2000)
-			return setTimeout(()=>{test(element)},4000)
+			for (let a=0 ; a<9 ; a++)
+			{
+				const element={typ:1,punkty:[],grubosc:2,kolorLini:"#253911"}
+				element.punkty.push([27,27+(a*38)])
+				element.punkty.push([27,673-(a*38)])
+				element.punkty.push([673,673-(a*38)])
+				element.punkty.push([673,27+(a*38)])
+				elementy.push(element)
+			}
+			for (let a=0 ; a<9 ; a++)
+			{
+				const element={typ:1,punkty:[],grubosc:2,kolorLini:"#253911"}
+				element.punkty.push([27+(a*38),27])
+				element.punkty.push([673-(a*38),27])
+				element.punkty.push([673-(a*38),673])
+				element.punkty.push([27+(a*38),673])
+				elementy.push(element)
+			}
 		}
+		for (let uklad of widoczneUklady)
+		{
+			elementy.push({typ:0,kolor:uklad.kolor,srodek:[uklad.Ywidok,uklad.Xwidok],promien:(uklad.wielkosc*1.5),rozmycie:(uklad.wielkosc*2),krycie:1})
+			elementy.push({typ:0,kolor:uklad.kolor,srodek:[uklad.Ywidok,uklad.Xwidok],promien:uklad.wielkosc*1})
+		}
+		ekran.mapa.obraz={h:700,d:700,elementy:elementy}
+		ekran.mapa.otworz()
+	}
+	function szukajUkladu(y,x)
+	{
+		return {wielkosc:Math.floor(Math.random()*9)+1,kolor:`hsl(${0+Math.floor(Math.random()*60)},${Math.floor(Math.random()*10)+90}%,${Math.floor(Math.random()*50)+50}%)`,nazwa:"test",przesuniecie:Math.floor(Math.random()*9)+1}
 	}
 </script>
 </head>
