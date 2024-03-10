@@ -205,7 +205,7 @@
 			{
 				ekran.mapa.dotyki.push({y:uklad.polozenieWidokProcent[0],x:uklad.polozenieWidokProcent[1],funkcja:function(){zaznaczUklad(uklad.polozenie[0],uklad.polozenie[1])}})
 			}
-			ekran.mapa.otworz()
+			setTimeout(()=>{ekran.mapa.otworz()},200)
 		}
 	}
 	function realnePolozenie(y,x,przesuniecie)
