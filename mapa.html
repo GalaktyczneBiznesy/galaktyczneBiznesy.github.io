@@ -26,7 +26,8 @@
 	{
 	    constructor(nazwa)
 	    {
-	    	this.obraz={d:1000,h:1000,elementy:[{typ:0,kolor:"#f7391b",srodek:[550,450],promien:400,zakresKatow:[0.2,1.22],grubosc:27,kolorLini:"green"}]}//do testów
+	    	this.obraz=[]
+	    	this.dotyki=[{y:40,x:40,funkcja:function(){console.log("test")}}]//lista {y:położenie%,x:polozenie%,funkcja:funkcja po kliknięciu}
 	    	this.stan=0
 	    	this.div=document.createElement("div")
 	    	this.div.className="ekran"
@@ -55,12 +56,22 @@
 	    		this.narozniki.push(naroznik)
 	    		this.div.appendChild(naroznik.div)
 	    	}
-	    	this.canvas=document.createElement("canvas")
-	    	this.canvas.style.transition="0.3s"
-			this.canvas.className="ekran-canvas"
-			this.canvas.id=`${nazwa}-canvas`
-			this.canvas.style.opacity=this.stan
-			this.div.appendChild(this.canvas)
+	    	this.canvas=[]
+	    	for (let i=0 ; i<3 ; i++)
+	    	{
+	    		this.canvas[i]=document.createElement("canvas")
+		    	this.canvas[i].style.transition="0.3s"
+				this.canvas[i].className="ekran-canvas"
+				this.canvas[i].id=`${nazwa}-canvas`
+				this.canvas[i].style.opacity=this.stan
+				this.div.appendChild(this.canvas[i])
+	    	}
+	    	if (true)
+	    	{
+	    		this.divDotyk=document.createElement("div")
+	    		this.divDotyk.className="divDotyk"
+	    		this.div.appendChild(this.divDotyk)
+	    	}
 	    }
 	    zamknij()
 	    {
@@ -74,10 +85,26 @@
 	    }
 	    dopasujStan()
 	    {
-	    	setTimeout(()=>{this.canvas.style.opacity=this.stan},[1,150][this.stan])
+	    	this.divDotyk.innerHTML=""
+	    	setTimeout(()=>{for(let i=0 ; i<3 ; i++){this.canvas[i].style.opacity=this.stan}},[1,150][this.stan])
 	    	if (this.stan)
 	    	{
-	    		rysuj(this.canvas,this.obraz)
+	    		for (let i=0 ; i<3 ; i++)
+	    		{
+	    			if (this.obraz[i])
+	    			{
+	    				rysuj(this.canvas[i],this.obraz[i])
+	    			}
+	    		}
+	    		for (let i=0 ; i<this.dotyki.length ; i++)
+	    		{
+	    			const zaznacznik=document.createElement("div")
+	    			zaznacznik.className="zaznacznik"
+	    			zaznacznik.style.top=`${this.dotyki[i].y}%`
+	    			zaznacznik.style.left=`${this.dotyki[i].x}%`
+	    			zaznacznik.onclick=this.dotyki[i].funkcja
+	    			setTimeout(()=>{this.divDotyk.appendChild(zaznacznik)},[1,150][this.stan])
+	    		}
 	    	}
 	    	for (const naroznik of this.narozniki)
 	    	{
@@ -101,24 +128,34 @@
 	function zaznaczUklad(y,x)
 	{
 		polozenie.unshift([y,x])
-		ekran.mapa.zamknij()
-		pokazMape()
+		setTimeout(()=>{ekran.mapa.zamknij()},400)
+		setTimeout(pokazMape,1000)
 	}
 	function pokazMape()
 	{
 		widoczneUklady=[]
+		const pole=700/5
 		for (let y=0 ; y<5 ; y++)
 		{
 			for (let x=0 ; x<5 ; x++)
 			{
-				const Y=polozenie[0][0]-2+y
-				const X=polozenie[0][1]-2+x
-				const uklad=szukajUkladu(Y,X)
+				const Y=(polozenie[0][0]-2)+y
+				const X=(polozenie[0][1]-2)+x
+				const uklad=szukajWygladuUkladu(Y,X)
 				if (uklad)
 				{
-					uklad.Ywidok=(70+(140*y))+([0,-40,-40,-40,0,0,0,40,40,40,0][uklad.przesuniecie]||0)+[-10,0,10,0,10,-10,0][((Y+X)%6)]
-					uklad.Xwidok=(70+(140*x))+([0,-40,0,40,-40,0,40,-40,0,40,0][uklad.przesuniecie]||0)+[0,10,-10,-10,0,10,0][((Y+X)%6)]
-					widoczneUklady.push(uklad)
+					if (uklad.wielkosc>0 && uklad.przesuniecie>0)
+					{
+						const procent=realnePolozenie(Y,X,uklad.przesuniecie,pole)
+						uklad.polozenie=[Y,X]
+						uklad.polozenieWidok=[]
+						uklad.polozenieWidok[0]=(y*pole)+(procent[0]*pole)
+						uklad.polozenieWidok[1]=(x*pole)+(procent[1]*pole)
+						uklad.polozenieWidokProcent=[]
+						uklad.polozenieWidokProcent[0]=(y*20)+(procent[0]*20)
+						uklad.polozenieWidokProcent[1]=(x*20)+(procent[1]*20)
+						widoczneUklady.push(uklad)
+					}
 				}
 				else
 				{
@@ -126,40 +163,78 @@
 				}
 			}
 		}
-		const elementy=[]
-		elementy.push({typ:1,punkty:[[14,686],[686,686],[686,14],[14,14]],grubosc:27,kolorLini:"#253911",krycie:0.2})
+		if (!ekran.mapa.obraz[0])
+		{
+			const elementy=[]
+			elementy.push({typ:1,punkty:[[14,686],[686,686],[686,14],[14,14]],grubosc:27,kolorLini:"#253911",krycie:0.2})
+			elementy.push({typ:1,punkty:[[27,27],[673,27],[673,673],[27,673]],kolor:"#000000",krycie:0.4})
+			if (true)
+			{
+				for (let a=0 ; a<9 ; a++)
+				{
+					const element={typ:1,punkty:[],grubosc:2,kolorLini:"#253911"}
+					element.punkty.push([27,27+(a*38)])
+					element.punkty.push([27,673-(a*38)])
+					element.punkty.push([673,673-(a*38)])
+					element.punkty.push([673,27+(a*38)])
+					elementy.push(element)
+				}
+				for (let a=0 ; a<9 ; a++)
+				{
+					const element={typ:1,punkty:[],grubosc:2,kolorLini:"#253911"}
+					element.punkty.push([27+(a*38),27])
+					element.punkty.push([673-(a*38),27])
+					element.punkty.push([673-(a*38),673])
+					element.punkty.push([27+(a*38),673])
+					elementy.push(element)
+				}
+			}
+			ekran.mapa.obraz[0]={h:700,d:700,elementy:elementy}
+		}
 		if (true)
 		{
-			for (let a=0 ; a<9 ; a++)
+			const elementy=[]
+			for (let uklad of widoczneUklady)
 			{
-				const element={typ:1,punkty:[],grubosc:2,kolorLini:"#253911"}
-				element.punkty.push([27,27+(a*38)])
-				element.punkty.push([27,673-(a*38)])
-				element.punkty.push([673,673-(a*38)])
-				element.punkty.push([673,27+(a*38)])
-				elementy.push(element)
+				elementy.push({typ:0,kolor:uklad.kolor,srodek:uklad.polozenieWidok,promien:(uklad.wielkosc*1.2)+1,rozmycie:(uklad.wielkosc*1.5),krycie:1})
+				elementy.push({typ:0,kolor:uklad.kolor,srodek:uklad.polozenieWidok,promien:uklad.wielkosc+1})
 			}
-			for (let a=0 ; a<9 ; a++)
+			ekran.mapa.obraz[2]={h:700,d:700,elementy:elementy}
+			ekran.mapa.dotyki=[]
+			for (let uklad of widoczneUklady)
 			{
-				const element={typ:1,punkty:[],grubosc:2,kolorLini:"#253911"}
-				element.punkty.push([27+(a*38),27])
-				element.punkty.push([673-(a*38),27])
-				element.punkty.push([673-(a*38),673])
-				element.punkty.push([27+(a*38),673])
-				elementy.push(element)
+				ekran.mapa.dotyki.push({y:uklad.polozenieWidokProcent[0],x:uklad.polozenieWidokProcent[1],funkcja:function(){zaznaczUklad(uklad.polozenie[0],uklad.polozenie[1])}})
 			}
+			ekran.mapa.otworz()
 		}
-		for (let uklad of widoczneUklady)
-		{
-			elementy.push({typ:0,kolor:uklad.kolor,srodek:[uklad.Ywidok,uklad.Xwidok],promien:(uklad.wielkosc*1.5),rozmycie:(uklad.wielkosc*2),krycie:1})
-			elementy.push({typ:0,kolor:uklad.kolor,srodek:[uklad.Ywidok,uklad.Xwidok],promien:uklad.wielkosc*1})
-		}
-		ekran.mapa.obraz={h:700,d:700,elementy:elementy}
-		ekran.mapa.otworz()
 	}
-	function szukajUkladu(y,x)
+	function realnePolozenie(y,x,przesuniecie)
 	{
-		return {wielkosc:Math.floor(Math.random()*9)+1,kolor:`hsl(${0+Math.floor(Math.random()*60)},${Math.floor(Math.random()*10)+90}%,${Math.floor(Math.random()*50)+50}%)`,nazwa:"test",przesuniecie:Math.floor(Math.random()*9)+1}
+		// y i x to położenie na planszy
+		// przesunięcie to wartość przypisana dla układu od 1 do 9 włącznie (9 możliwości)
+		const q=[[0,2],[1,1],[2,2],[0,0],[1,2],[2,0],[0,1],[1,0],[2,1]]//schemat przesunięć
+		const nr=((y%3)*3)+x%3
+		// nr to jedno z 9 przesunięć zależne od położenia na planszy
+		const zwrotka=[]
+		const mnozniki=[15,25]//%
+		const margines=50-(mnozniki[0]+mnozniki[1])//% (nie może być mniejszy niż 0)
+		zwrotka[0]=margines+(q[nr][0]*mnozniki[0])+(q[przesuniecie-1][0]*mnozniki[1])
+		zwrotka[1]=margines+(q[nr][1]*mnozniki[0])+(q[przesuniecie-1][1]*mnozniki[1])
+		zwrotka[0]=Math.round((zwrotka[0])*100)/10000
+		zwrotka[1]=Math.round((zwrotka[1])*100)/10000
+		// wartość zwrotki będzie zaokrąglona do 2 miejsc po przecinku
+		// wartość zwrotki jest procentowa i oznacza przesunięcie w polu od lewego górnego narożnika
+		return zwrotka
+	}
+	function szukajWygladuUkladu(y,x)
+	{
+		//y,x,wielkość,przesunięcie,kolor,data odkrycia,ilość planet,nazwa
+		return {wielkosc:Math.floor(Math.random()*5),kolor:`hsl(${0+Math.floor(Math.random()*60)},${Math.floor(Math.random()*10)+90}%,${Math.floor(Math.random()*50)+50}%)`,nazwa:"test",przesuniecie:Math.floor(Math.random()*9)+1}
+	}
+	function szukajSzczegolowUkladu(y,x)
+	{
+		//sos,usługi,
+		return {wielkosc:Math.floor(Math.random()*6),kolor:`hsl(${0+Math.floor(Math.random()*60)},${Math.floor(Math.random()*10)+90}%,${Math.floor(Math.random()*50)+50}%)`,nazwa:"test",przesuniecie:Math.floor(Math.random()*9)+1}
 	}
 </script>
 </head>
