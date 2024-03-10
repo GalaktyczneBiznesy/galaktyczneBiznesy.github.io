@@ -1,3 +1,19 @@
+.zaznacznik
+{
+	position: absolute;
+	box-sizing: border-box;
+	width: 14%;
+	height: 14%;
+	margin-top: -7%;
+	margin-left: -7%;
+	clip-path: polygon(50% 15%, 100% 0%, 85% 50%, 100% 100%, 50% 85%, 0% 100%, 15% 50%, 0% 0%);
+	border: solid 0.4vh white;
+	opacity: 0;
+}
+.zaznacznik:hover
+{
+	opacity: 0.9;
+}
 @media screen and (max-width: 139.99vh)
 {
 	.ekran
@@ -9,6 +25,14 @@
 		margin-bottom: 3vh;
 	}
 	.ekran-canvas
+	{
+		position: absolute;
+		top: 0.5vh;
+		left: 0.5vh;
+		width: 43vh;
+		height: 43vh;
+	}
+	.divDotyk
 	{
 		position: absolute;
 		top: 0.5vh;
@@ -36,6 +60,14 @@
 		height: 62vh;
 	}
 	.ekran-canvas
+	{
+		position: absolute;
+		top: 0.5vh;
+		left: 0.5vh;
+		width: 61vh;
+		height: 61vh;
+	}
+	.divDotyk
 	{
 		position: absolute;
 		top: 0.5vh;
