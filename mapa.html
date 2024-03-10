@@ -60,7 +60,6 @@
 	    	for (let i=0 ; i<3 ; i++)
 	    	{
 	    		this.canvas[i]=document.createElement("canvas")
-		    	this.canvas[i].style.transition="0.2s"
 				this.canvas[i].className="ekran-canvas"
 				this.canvas[i].id=`${nazwa}-canvas`
 				this.canvas[i].style.opacity=this.stan
@@ -86,7 +85,7 @@
 	    dopasujStan()
 	    {
 	    	this.divDotyk.innerHTML=""
-	    	setTimeout(()=>{for(let i=0 ; i<3 ; i++){this.canvas[i].style.opacity=this.stan}},[1,300][this.stan])
+	    	setTimeout(()=>{for(let i=0 ; i<3 ; i++){this.canvas[i].style.opacity=this.stan}},[1,450][this.stan])
 	    	if (this.stan)
 	    	{
 	    		for (let i=0 ; i<3 ; i++)
@@ -103,7 +102,7 @@
 	    			zaznacznik.style.top=`${this.dotyki[i].y}%`
 	    			zaznacznik.style.left=`${this.dotyki[i].x}%`
 	    			zaznacznik.onclick=this.dotyki[i].funkcja
-	    			setTimeout(()=>{this.divDotyk.appendChild(zaznacznik)},[1,220][this.stan])
+	    			setTimeout(()=>{this.divDotyk.appendChild(zaznacznik)},[1,50][this.stan])
 	    		}
 	    	}
 	    	for (const naroznik of this.narozniki)
