@@ -20,7 +20,7 @@
 		document.getElementById("kontent").appendChild(ekran.mapa.div)
 		document.getElementById("kontent").appendChild(ekran.uklad.div)
 		setTimeout(()=>{menu.guziki[0][2].odswiez({aktywny:1,menu:'test',zaznaczony:1})},4000)
-		setTimeout(()=>{zaznaczUklad(352,352)},2000)
+		setTimeout(()=>{zaznaczUklad(352,352)},1000)
 	}
 	class Ekran
 	{
@@ -39,7 +39,7 @@
 	    		const naroznik={}
 	    		naroznik.div=document.createElement("div")
 	    		naroznik.div.style.position="absolute"
-	    		naroznik.div.style.transition="0.5s"
+	    		naroznik.div.style.transition="0.4s"
 	    		naroznik.div.style.width="15%"
 	    		naroznik.div.style.height="15%"
 	    		naroznik.strony=[]
@@ -60,7 +60,7 @@
 	    	for (let i=0 ; i<3 ; i++)
 	    	{
 	    		this.canvas[i]=document.createElement("canvas")
-		    	this.canvas[i].style.transition="0.3s"
+		    	this.canvas[i].style.transition="0.2s"
 				this.canvas[i].className="ekran-canvas"
 				this.canvas[i].id=`${nazwa}-canvas`
 				this.canvas[i].style.opacity=this.stan
@@ -86,7 +86,7 @@
 	    dopasujStan()
 	    {
 	    	this.divDotyk.innerHTML=""
-	    	setTimeout(()=>{for(let i=0 ; i<3 ; i++){this.canvas[i].style.opacity=this.stan}},[1,150][this.stan])
+	    	setTimeout(()=>{for(let i=0 ; i<3 ; i++){this.canvas[i].style.opacity=this.stan}},[1,300][this.stan])
 	    	if (this.stan)
 	    	{
 	    		for (let i=0 ; i<3 ; i++)
@@ -103,7 +103,7 @@
 	    			zaznacznik.style.top=`${this.dotyki[i].y}%`
 	    			zaznacznik.style.left=`${this.dotyki[i].x}%`
 	    			zaznacznik.onclick=this.dotyki[i].funkcja
-	    			setTimeout(()=>{this.divDotyk.appendChild(zaznacznik)},[1,150][this.stan])
+	    			setTimeout(()=>{this.divDotyk.appendChild(zaznacznik)},[1,220][this.stan])
 	    		}
 	    	}
 	    	for (const naroznik of this.narozniki)
