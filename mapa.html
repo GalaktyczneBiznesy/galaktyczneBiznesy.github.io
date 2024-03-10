@@ -129,7 +129,7 @@
 	{
 		polozenie.unshift([y,x])
 		setTimeout(()=>{ekran.mapa.zamknij()},400)
-		setTimeout(pokazMape,1000)
+		setTimeout(pokazMape,450)
 	}
 	function pokazMape()
 	{
@@ -205,7 +205,7 @@
 			{
 				ekran.mapa.dotyki.push({y:uklad.polozenieWidokProcent[0],x:uklad.polozenieWidokProcent[1],funkcja:function(){zaznaczUklad(uklad.polozenie[0],uklad.polozenie[1])}})
 			}
-			setTimeout(()=>{ekran.mapa.otworz()},200)
+			setTimeout(()=>{ekran.mapa.otworz()},600)
 		}
 	}
 	function realnePolozenie(y,x,przesuniecie)
