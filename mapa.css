@@ -24,15 +24,7 @@
 		height: 44vh;
 		margin-bottom: 3vh;
 	}
-	.ekran-canvas
-	{
-		position: absolute;
-		top: 0.5vh;
-		left: 0.5vh;
-		width: 43vh;
-		height: 43vh;
-	}
-	.divDotyk
+	.ekranWypelnienie
 	{
 		position: absolute;
 		top: 0.5vh;
@@ -59,15 +51,7 @@
 		width: 62vh;
 		height: 62vh;
 	}
-	.ekran-canvas
-	{
-		position: absolute;
-		top: 0.5vh;
-		left: 0.5vh;
-		width: 61vh;
-		height: 61vh;
-	}
-	.divDotyk
+	.ekranWypelnienie
 	{
 		position: absolute;
 		top: 0.5vh;
