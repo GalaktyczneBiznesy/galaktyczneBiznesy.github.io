@@ -39,7 +39,6 @@ const koduj=
 	},
 	tekst:function(tekst)
 	{
-		console.log(tekst)
 		let s=""
 		for (let a=0 ; a<tekst.length ; a++)
 		{
@@ -96,7 +95,7 @@ const koduj=
 		}
 		return s
 	},
-	wygladUkladu:function(y,x,wielkosc,przesuniecie,kolor,iloscPlanet,nazwa)
+	wygladUkladu:function(y,x,wielkosc,przesuniecie,kolor,iloscPlanet)
 	{
 		let szyfr=koduj.adres(y,x,0,1)
 		//Yukladu,Xukladu,planeta,polePlanety
@@ -115,7 +114,7 @@ const koduj=
 			l-=(znak*Math.pow(63,i))
 			szyfr+="qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890+"[znak]
 		}
-		return szyfr+koduj.tekst(nazwa)
+		return szyfr
 	},
 }
 const odkoduj=
@@ -213,7 +212,6 @@ const odkoduj=
 			wygladUkladu[["kolor","przesuniecie","iloscPlanet","wielkosc"][i]]=Math.floor(l/[320,32,4,1][i])
 			l-=wygladUkladu[["kolor","przesuniecie","iloscPlanet","wielkosc"][i]]*[320,32,4,1][i]
 		}
-		wygladUkladu.nazwa=odkoduj.tekst(szyfr.slice(6))
 		return wygladUkladu
 	},
 }
