@@ -11,6 +11,7 @@
 <script src="funkcjeKodowania.js"></script>
 <script src="funkcjeRysowania.js"></script>
 <script type="text/javascript">
+	const logi={}
 	const koloryPlanet=["#e31107","#e33907","#e34d07","#e37507","#ed9d07","#f7cf07","#f7ed07","#f7ed4d","#f7edb1","#e3e3f7","#89e3f7","#397ff7"]
 	const polozenie=[[350,350]]
 	const zapisane=
@@ -24,6 +25,7 @@
 		document.getElementById("kontent").appendChild(ekran.mapa.div)
 		document.getElementById("kontent").appendChild(ekran.uklad.div)
 		setTimeout(()=>{menu.guziki[0][2].odswiez({aktywny:1,menu:'test',zaznaczony:1})},4000)
+		setTimeout(()=>{menu.guziki[0][1].odswiez({aktywny:1,funkcja:'document.write(raportuj.drukuj())',zaznaczony:0})},4000)
 		setTimeout(()=>{zaznaczUklad(352,352)},1000)
 	}
 	class Ekran
@@ -94,10 +96,12 @@
 	    	{
 	    		for (let i=0 ; i<3 ; i++)
 	    		{
+	    			raportuj.start("rysowanie")
 	    			if (this.obraz[i])
 	    			{
 	    				rysuj(this.canvas[i],this.obraz[i])
 	    			}
+	    			raportuj.koniec("rysowanie")
 	    		}
 	    		for (let i=0 ; i<this.dotyki.length ; i++)
 	    		{
@@ -214,6 +218,7 @@
 			}
 			if (true)
 			{
+				raportuj.start("przygotwanie obrazka - mapa")
 				const elementy=[]
 				for (let uklad of widoczneUklady)
 				{
@@ -227,6 +232,7 @@
 					ekran.mapa.dotyki.push({y:uklad.polozenieWidokProcent[0],x:uklad.polozenieWidokProcent[1],funkcja:function(){zaznaczUklad(uklad.polozenie[0],uklad.polozenie[1])}})
 				}
 				setTimeout(()=>{ekran.mapa.otworz()},600)
+				raportuj.koniec("przygotwanie obrazka - mapa")
 			}
 		},
 		minimape:function()
@@ -290,6 +296,7 @@
 			}
 			if (true)
 			{
+				raportuj.start("przygotwanie obrazka - minimapa")
 				const elementy=[]
 				for (let uklad of widoczneUklady)
 				{
@@ -298,6 +305,7 @@
 				ekran.uklad.obraz[2]={h:700,d:700,elementy:elementy}
 				ekran.uklad.dotyki=[]
 				setTimeout(()=>{ekran.uklad.otworz()},600)
+				raportuj.koniec("przygotwanie obrazka - minimapa")
 			}
 		},
 		szczegolyMapy:function()
@@ -347,6 +355,7 @@
 	{
 		wygladUkladow:function(lista)
 		{
+			raportuj.start("serwer - nadanie")
 			const zwrotka=[]
 			for (let a=0 ; a<lista.length ; a++)
 			{
@@ -359,14 +368,16 @@
 					zwrotka.push(koduj.wygladUkladu(lista[a][0],lista[a][1],Math.floor(Math.random()*4),Math.floor(Math.random()*9),Math.floor(Math.random()*12),Math.floor(Math.random()*8),"Testowa Nazwa"))
 				}
 			}
-			return setTimeout(()=>{console.log("odpowiedź");odbiorSeerwera.wygladUkladow(zwrotka)},500+Math.random()*5000)
+			raportuj.koniec("serwer - nadanie")
+			return setTimeout(()=>{odbiorSeerwera.wygladUkladow(zwrotka)},500+Math.random()*5000)
 		},
 	}
 	const odbiorSeerwera=
 	{
 		wygladUkladow:function(lista)
 		{
-			console.log(lista.length)
+			raportuj.start("serwer - odbiór")
+			console.log(`z serwera odebrano ${lista.length} układów`)
 			for (let a=0 ; a<lista.length ; a++)
 			{
 				const uklad=odkoduj.wygladUkladu(lista[a])
@@ -374,6 +385,53 @@
 				const pozycja=((uklad.y%50)*50)+(uklad.x%50)
 				zapisane.widokiUkladow[nrListy][pozycja]=[uklad.y,uklad.x,lista[a]]
 			}
+			raportuj.koniec("serwer - odbiór")
+		}
+	}
+	raportuj=
+	{
+		start:function(typ)
+		{
+			logi[typ]=logi[typ]||[]
+			const raportID=logi[typ].length
+			logi[typ][raportID]=[Date.now()]
+			return raportID
+		},
+		koniec:function(typ,raportID)
+		{
+			if(!logi[typ]){return}
+			if (raportID)
+			{
+				logi[typ][raportID][1]=Date.now()
+			}
+			else
+			{
+				logi[typ][logi[typ].length-1][1]=Date.now()
+			}
+		},
+		drukuj:function()
+		{
+			let s=""
+			for (k in logi)
+			{
+				s+=`${k}:<br>`
+				for (let log of logi[k])
+				{
+					if (Array.isArray(log))
+					{
+						if (!(log[0]>0 && log[1]>0))
+						{
+							s+=`log uszkodzony<br>`
+						}
+						else
+						{
+							s+=`${log[1]-log[0]}ms<br>`
+						}
+					}
+				}
+				s+="<br>"
+			}
+			return s
 		}
 	}
 </script>
