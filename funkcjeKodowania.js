@@ -39,6 +39,7 @@ const koduj=
 	},
 	tekst:function(tekst)
 	{
+		console.log(tekst)
 		let s=""
 		for (let a=0 ; a<tekst.length ; a++)
 		{
