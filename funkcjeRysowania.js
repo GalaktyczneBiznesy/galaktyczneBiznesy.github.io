@@ -6,6 +6,7 @@ function rysuj(plutno,budowaObrazka)
 	plutno.width=budowaObrazka.d||1000
 	function rysujelement(typ,kolor,punkty,srodek,promien,zakresKatow,grubosc,kolorLini,rozmycie,krycie)
 	{
+		return
 		ctx.filter=`blur(${Number(rozmycie)||0}px)`
 		ctx.globalAlpha=Number(krycie)||1
 		ctx.lineWidth=grubosc||0
