@@ -158,7 +158,7 @@
 			ekran.uklad.nadajStan(0)
 			pokaz.mape()
 			pokaz.minimape()
-		},300)
+		},150)
 	}
 	pokaz=
 	{
@@ -171,9 +171,32 @@
 			//
 			ekran.mapa.dotyk.elementy=[]
 			const elementy=[]
+			const korekta=[0,0]
 			for (let uklad of lista)
 			{
-				if (uklad.wielkosc<1 || uklad.przesuniecie<1){console.log(`nie ma układu:`,uklad);continue}
+				if (uklad.y==polozenie[0][0] && uklad.x==polozenie[0][1])
+				{
+					if (!(uklad.przesuniecie>0)){break}
+					const procent=realnePolozenieUkladu(uklad.y,uklad.x,uklad.przesuniecie)
+					for (let i=0 ; i<2 ; i++)
+					{
+						//console.log(`${"YX"[i]}: ${0.5-procent[i]}`)
+						korekta[i]=Math.round((0.5-procent[i])*100)/100
+						if (korekta[i]>0.15)
+						{
+							korekta[i]=0.15
+						}
+						else if (korekta[i]<-0.15)
+						{
+							korekta[i]=-0.15
+						}
+					}
+				}
+			}
+			console.log(korekta)
+			for (let uklad of lista)
+			{
+				if (uklad.wielkosc<1 || uklad.przesuniecie<1){continue}
 				const wzgledneY=(uklad.y-polozenie[0][0])+2
 				const wzgledneX=(uklad.x-polozenie[0][1])+2
 				if (!(wzgledneY>=0 && wzgledneY<5 && wzgledneX>=0 && wzgledneX<5))
@@ -182,10 +205,21 @@
 					continue
 				}
 				const procent=realnePolozenieUkladu(uklad.y,uklad.x,uklad.przesuniecie)
-				elementy.push({kolor:koloryPlanet[uklad.kolor],srodek:[140*wzgledneY+140*procent[0],140*wzgledneX+140*procent[1]],promien:uklad.wielkosc+2})//do poprawki
+				const srodek=[140*wzgledneY+140*(procent[0]+korekta[0]),140*wzgledneX+140*(procent[1]+korekta[1])]
+				elementy.push({kolor:koloryPlanet[uklad.kolor],srodek:srodek,promien:uklad.wielkosc+2})
 				if (uklad.y!=polozenie[0][0] || uklad.x!=polozenie[0][1])
 				{
-					ekran.mapa.dotyk.elementy.push({y:wzgledneY*20+(procent[0]*20),x:wzgledneX*20+(procent[1]*20),funkcja:`zaznaczUklad(${uklad.y},${uklad.x})`})
+					ekran.mapa.dotyk.elementy.push({y:wzgledneY*20+((procent[0]+korekta[0])*20),x:wzgledneX*20+((procent[1]+korekta[1])*20),funkcja:`zaznaczUklad(${uklad.y},${uklad.x})`})
+					if (uklad.iloscPlanet<1){debugger}
+					for (let i=0 ; i<uklad.iloscPlanet ; i++)
+					{
+						//dodawanie planet
+						const zakresKatow=[]
+						zakresKatow[0]=Math.random()*2
+						zakresKatow[1]=zakresKatow[0]+(Math.random()*0.25)+(1.7/((i+1)*2))
+						if (zakresKatow[1]>2){zakresKatow[1]-=2}
+						elementy.push({kolorLini:"#393939",grubosc:1,srodek:srodek,promien:(uklad.wielkosc+2)+(i*4)+5,zakresKatow:zakresKatow})
+					}
 				}
 			}
 			ekran.mapa.obraz_1.obraz={h:700,d:700,elementy:elementy}
@@ -199,11 +233,21 @@
 			const lista=uzupelnianieDanych.wygladUkladow(polozenie[0][0]-17,polozenie[0][0]+17,polozenie[0][1]-17,polozenie[0][1]+17,77)
 			if (!Array.isArray(lista)){return setTimeout(()=>{pokaz.minimape(proba+1)},400)}
 			//
+			if (true)
+			{
+				const elementy=[]
+				elementy[0]={kolorLini:"green",punkty:[[300,320],[300,300],[320,300],[400,380],[400,400],[380,400]],grubosc:3}
+				elementy[1]={kolorLini:"green",punkty:[[380,300],[400,300],[400,320],[320,400],[300,400],[300,380]],grubosc:3}
+				elementy[2]={kolor:"black",punkty:[[302,302],[302,398],[398,398],[398,302]]}
+				ekran.uklad.tlo.obraz={h:700,d:700,elementy:elementy}
+				rysuj(ekran.uklad.tlo.canvas,ekran.uklad.tlo.obraz)
+			}
+			//
 			ekran.uklad.dotyk.elementy=[]
 			const elementy=[]
 			for (let uklad of lista)
 			{
-				if (uklad.wielkosc<1 || uklad.przesuniecie<1){console.log(`nie ma układu:`,uklad);continue}
+				if (uklad.wielkosc<1 || uklad.przesuniecie<1){continue}
 				const wzgledneY=(uklad.y-polozenie[0][0])+17
 				const wzgledneX=(uklad.x-polozenie[0][1])+17
 				if (!(wzgledneY>=0 && wzgledneY<35 && wzgledneX>=0 && wzgledneX<35))
@@ -212,7 +256,7 @@
 					continue
 				}
 				const procent=realnePolozenieUkladu(uklad.y,uklad.x,uklad.przesuniecie)
-				elementy.push({kolor:koloryPlanet[uklad.kolor],srodek:[20*wzgledneY+20*procent[0],20*wzgledneX+20*procent[1]],promien:Math.ceil(uklad.wielkosc/2)})//do poprawki
+				elementy.push({kolor:"white",srodek:[20*wzgledneY+20*procent[0],20*wzgledneX+20*procent[1]],promien:(uklad.wielkosc/2)})
 			}
 			ekran.uklad.obraz_1.obraz={h:700,d:700,elementy:elementy}
 			//
@@ -348,8 +392,8 @@
 		const nr=((y%3)*3)+x%3
 		// nr to jedno z 9 przesunięć zależne od położenia na planszy
 		const zwrotka=[]
-		const mnozniki=[15,25]//%
-		const margines=50-(mnozniki[0]+mnozniki[1])//% (nie może być mniejszy niż 0)
+		const mnozniki=[11,20]//%
+		const margines=50-(mnozniki[0]+mnozniki[1])//% (margines nie może być mniejszy niż 15%)
 		zwrotka[0]=margines+(q[nr][0]*mnozniki[0])+(q[przesuniecie-1][0]*mnozniki[1])
 		zwrotka[1]=margines+(q[nr][1]*mnozniki[0])+(q[przesuniecie-1][1]*mnozniki[1])
 		zwrotka[0]=Math.round((zwrotka[0])*100)/10000
