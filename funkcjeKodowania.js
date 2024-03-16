@@ -100,14 +100,14 @@ const koduj=
 		let szyfr=koduj.adres(y,x,0,1)
 		//Yukladu,Xukladu,planeta,polePlanety
 		//testowanie
-		if (!(kolor>-1 && kolor<12 && przesuniecie>-1 && przesuniecie<10 && iloscPlanet>-1 && iloscPlanet<8 && wielkosc>-1 && wielkosc<4))
+		if (!(kolor>-1 && kolor<12 && przesuniecie>-1 && przesuniecie<10 && iloscPlanet>-1 && iloscPlanet<8 && wielkosc>0 && wielkosc<5))
 		{
 			console.log("błąd")
 			debugger
 			return 'qqqqqq'
 		}
 		//koniec testowania
-		let l=(kolor*320)+(przesuniecie*32)+(iloscPlanet*4)+(wielkosc)
+		let l=(kolor*320)+(przesuniecie*32)+(iloscPlanet*4)+(wielkosc-1)
 		for (let i=1 ; i>=0 ; i--)
 		{
 			const znak=Math.floor(l/Math.pow(63,i))
@@ -212,6 +212,7 @@ const odkoduj=
 			wygladUkladu[["kolor","przesuniecie","iloscPlanet","wielkosc"][i]]=Math.floor(l/[320,32,4,1][i])
 			l-=wygladUkladu[["kolor","przesuniecie","iloscPlanet","wielkosc"][i]]*[320,32,4,1][i]
 		}
+		wygladUkladu.wielkosc++
 		return wygladUkladu
 	},
 }
