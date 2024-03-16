@@ -20,8 +20,17 @@
 		document.getElementById("kontent").appendChild(ekran.mapa.div)
 		document.getElementById("kontent").appendChild(ekran.uklad.div)
 		setTimeout(()=>{menu.guziki[0][2].odswiez({aktywny:1,menu:'test',zaznaczony:1})},4000)
-		setTimeout(()=>{menu.guziki[0][1].odswiez({aktywny:1,funkcja:'document.write(raportuj.drukuj())',zaznaczony:0})},4000)
+		setTimeout(()=>{menu.guziki[0][1].odswiez({aktywny:1,funkcja:'alert(i co mnie klikasz tutej)',zaznaczony:0})},4000)
 		setTimeout(()=>{zaznaczUklad(352,352)},500)
+		if (true)
+		{
+			const elementy=[]
+			elementy[0]={kolorLini:"green",punkty:[[300,320],[300,300],[320,300],[400,380],[400,400],[380,400]],grubosc:3}
+			elementy[1]={kolorLini:"green",punkty:[[380,300],[400,300],[400,320],[320,400],[300,400],[300,380]],grubosc:3}
+			elementy[2]={kolor:"black",punkty:[[302,302],[302,398],[398,398],[398,302]]}
+			ekran.uklad.tlo.obraz={h:700,d:700,elementy:elementy}
+			rysuj(ekran.uklad.tlo.canvas,ekran.uklad.tlo.obraz)
+		}
 	}
 	class Ekran
 	{
@@ -42,6 +51,7 @@
 			this.obraz_1.canvas.className="ekranWypelnienie"
 			this.obraz_2={obraz:0,canvas:document.createElement("canvas")}
 			this.obraz_2.canvas.className="ekranWypelnienie"
+			this.obraz_2.canvas.style.transition="0.2s"
 			this.interaktywne={elementy:0,div:document.createElement("div")}
 			this.interaktywne.div.className="ekranWypelnienie"
 			this.dotyk={elementy:[],div:document.createElement("div")}
@@ -83,6 +93,11 @@
 			this.dotyk.div.innerHTML=""
 			//
 			if (stan){this.nadanieWypelnienia()}
+			else
+			{
+				this.interaktywne.div.innerHTML=""
+				this.obraz_2.canvas.style.opacity=0
+			}
 			setTimeout(()=>{this.krycieWypelnienia(stan)},[1,310][stan])
 			setTimeout(()=>{this.stanNaroznikow(stan)},[50,1][stan])
 			setTimeout(()=>{this.zmiana=0},350)
@@ -91,7 +106,6 @@
 		{
 			this.tlo.canvas.style.opacity=stan
 			this.obraz_1.canvas.style.opacity=stan
-			this.obraz_2.canvas.style.opacity=stan
 			this.interaktywne.div.style.opacity=stan
 			this.dotyk.div.style.opacity=stan
 		}
@@ -108,9 +122,6 @@
 		nadanieWypelnienia()
 		{
 			if ((this.obraz_1.obraz||{elementy:[]}).elementy.length){rysuj(this.obraz_1.canvas,this.obraz_1.obraz)}
-			if ((this.obraz_2.obraz||{elementy:[]}).elementy.length){rysuj(this.obraz_2.canvas,this.obraz_2.obraz)}
-			this.interaktywne.div.innerHTML=""
-			if ((this.interaktywne.elementy||[]).length){console.log("do uzupełnienia")}
 			this.dotyk.div.innerHTML=""
 			this.aktywny=1
 			for (let i=0 ; i<(this.dotyk.elementy||[]).length ; i++)
@@ -170,30 +181,28 @@
 			if (!Array.isArray(lista)){return setTimeout(()=>{pokaz.mape(proba+1)},300)}
 			//
 			ekran.mapa.dotyk.elementy=[]
-			const elementy=[]
-			const korekta=[0,0]
-			for (let uklad of lista)
+			ekran.mapa.korekta=[0,0]
+			ekran.mapa.ukladCentralny=0
+			ekran.mapa.ukladCentralny=uzupelnianieDanych.wygladUkladow(polozenie[0][0]-2,polozenie[0][0]+2,polozenie[0][1]-2,polozenie[0][1]+2,77)[0]
+			if (ekran.mapa.ukladCentralny && ekran.mapa.ukladCentralny.przesuniecie)
 			{
-				if (uklad.y==polozenie[0][0] && uklad.x==polozenie[0][1])
+				//korekta jest potrzebna ponieważ układy są sztucznie poprzesuwane i żeby centralny był na środku całą mapę trzeba lekkko przesunąć
+				const procent=realnePolozenieUkladu(ekran.mapa.ukladCentralny.y,ekran.mapa.ukladCentralny.x,ekran.mapa.ukladCentralny.przesuniecie)
+				for (let i=0 ; i<2 ; i++)
 				{
-					if (!(uklad.przesuniecie>0)){break}
-					const procent=realnePolozenieUkladu(uklad.y,uklad.x,uklad.przesuniecie)
-					for (let i=0 ; i<2 ; i++)
+					//console.log(`${"YX"[i]}: ${0.5-procent[i]}`)
+					ekran.mapa.korekta[i]=Math.round((0.5-procent[i])*100)/100
+					if (ekran.mapa.korekta[i]>0.15)
 					{
-						//console.log(`${"YX"[i]}: ${0.5-procent[i]}`)
-						korekta[i]=Math.round((0.5-procent[i])*100)/100
-						if (korekta[i]>0.15)
-						{
-							korekta[i]=0.15
-						}
-						else if (korekta[i]<-0.15)
-						{
-							korekta[i]=-0.15
-						}
+						ekran.mapa.korekta[i]=0.15
+					}
+					else if (ekran.mapa.korekta[i]<-0.15)
+					{
+						ekran.mapa.korekta[i]=-0.15
 					}
 				}
 			}
-			console.log(korekta)
+			const elementy=[]
 			for (let uklad of lista)
 			{
 				if (uklad.wielkosc<1 || uklad.przesuniecie<1){continue}
@@ -205,20 +214,20 @@
 					continue
 				}
 				const procent=realnePolozenieUkladu(uklad.y,uklad.x,uklad.przesuniecie)
-				const srodek=[140*wzgledneY+140*(procent[0]+korekta[0]),140*wzgledneX+140*(procent[1]+korekta[1])]
+				const srodek=[140*wzgledneY+140*(procent[0]+ekran.mapa.korekta[0]),140*wzgledneX+140*(procent[1]+ekran.mapa.korekta[1])]
 				elementy.push({kolor:koloryPlanet[uklad.kolor],srodek:srodek,promien:uklad.wielkosc+2})
 				if (uklad.y!=polozenie[0][0] || uklad.x!=polozenie[0][1])
 				{
-					ekran.mapa.dotyk.elementy.push({y:wzgledneY*20+((procent[0]+korekta[0])*20),x:wzgledneX*20+((procent[1]+korekta[1])*20),funkcja:`zaznaczUklad(${uklad.y},${uklad.x})`})
+					ekran.mapa.dotyk.elementy.push({y:wzgledneY*20+((procent[0]+ekran.mapa.korekta[0])*20),x:wzgledneX*20+((procent[1]+ekran.mapa.korekta[1])*20),funkcja:`zaznaczUklad(${uklad.y},${uklad.x})`})
 					if (uklad.iloscPlanet<1){debugger}
 					for (let i=0 ; i<uklad.iloscPlanet ; i++)
 					{
 						//dodawanie planet
 						const zakresKatow=[]
 						zakresKatow[0]=Math.random()*2
-						zakresKatow[1]=zakresKatow[0]+(Math.random()*0.25)+(1.7/((i+1)*2))
+						zakresKatow[1]=zakresKatow[0]+(Math.random()*0.25)+(1.7/((i+1)*3))
 						if (zakresKatow[1]>2){zakresKatow[1]-=2}
-						elementy.push({kolorLini:"#393939",grubosc:1,srodek:srodek,promien:(uklad.wielkosc+2)+(i*4)+5,zakresKatow:zakresKatow})
+						elementy.push({kolorLini:"#4d4d4d",grubosc:1,srodek:srodek,promien:(uklad.wielkosc+2)+(i*4)+5,zakresKatow:zakresKatow})
 					}
 				}
 			}
@@ -233,16 +242,6 @@
 			const lista=uzupelnianieDanych.wygladUkladow(polozenie[0][0]-17,polozenie[0][0]+17,polozenie[0][1]-17,polozenie[0][1]+17,77)
 			if (!Array.isArray(lista)){return setTimeout(()=>{pokaz.minimape(proba+1)},400)}
 			//
-			if (true)
-			{
-				const elementy=[]
-				elementy[0]={kolorLini:"green",punkty:[[300,320],[300,300],[320,300],[400,380],[400,400],[380,400]],grubosc:3}
-				elementy[1]={kolorLini:"green",punkty:[[380,300],[400,300],[400,320],[320,400],[300,400],[300,380]],grubosc:3}
-				elementy[2]={kolor:"black",punkty:[[302,302],[302,398],[398,398],[398,302]]}
-				ekran.uklad.tlo.obraz={h:700,d:700,elementy:elementy}
-				rysuj(ekran.uklad.tlo.canvas,ekran.uklad.tlo.obraz)
-			}
-			//
 			ekran.uklad.dotyk.elementy=[]
 			const elementy=[]
 			for (let uklad of lista)
@@ -256,16 +255,13 @@
 					continue
 				}
 				const procent=realnePolozenieUkladu(uklad.y,uklad.x,uklad.przesuniecie)
-				elementy.push({kolor:"white",srodek:[20*wzgledneY+20*procent[0],20*wzgledneX+20*procent[1]],promien:(uklad.wielkosc/2)})
+				const kolor=((uklad.wielkosc*10)+uklad.iloscPlanet)*4
+				elementy.push({kolor:`rgba(${kolor},${kolor},${kolor})`,srodek:[20*wzgledneY+20*procent[0],20*wzgledneX+20*procent[1]],promien:(uklad.wielkosc/4)+1.5})
 			}
 			ekran.uklad.obraz_1.obraz={h:700,d:700,elementy:elementy}
 			//
 			setTimeout(()=>{ekran.uklad.nadajStan(1)},370)
 		},
-		siatka(canvas,margines,oczko,kolor)
-		{
-			//
-		}
 	}
 	uzupelnianieDanych=
 	{
@@ -316,14 +312,14 @@
 				{
 					//funkcja testowa, losuje ukłądy i zwraca jak serwer
 					let s;
-					if (!(uklad[0]>-1 && uklad[0]<700 && uklad[1]>-1 && uklad[1]<700))
+					if (Math.random()<0.3 || !(uklad[0]>-1 && uklad[0]<700 && uklad[1]>-1 && uklad[1]<700))
 					{
 						//kiedy pytanie o ukłąd poza planszą zwraca brak
-						s=koduj.wygladUkladu(uklad[0],uklad[1],0,0,0,0)
+						s=koduj.wygladUkladu(uklad[0],uklad[1],1,0,0,0)
 					}
 					else
 					{
-						s=koduj.wygladUkladu(uklad[0],uklad[1],los(0,3),los(0,9),los(0,11),los(1,7))
+						s=koduj.wygladUkladu(uklad[0],uklad[1],los(1,4),los(0,9),los(0,11),los(1,7))
 					}
 					zwrotka+=s
 				}
@@ -392,7 +388,7 @@
 		const nr=((y%3)*3)+x%3
 		// nr to jedno z 9 przesunięć zależne od położenia na planszy
 		const zwrotka=[]
-		const mnozniki=[11,20]//%
+		const mnozniki=[8,24]//%
 		const margines=50-(mnozniki[0]+mnozniki[1])//% (margines nie może być mniejszy niż 15%)
 		zwrotka[0]=margines+(q[nr][0]*mnozniki[0])+(q[przesuniecie-1][0]*mnozniki[1])
 		zwrotka[1]=margines+(q[nr][1]*mnozniki[0])+(q[przesuniecie-1][1]*mnozniki[1])
