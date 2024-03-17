@@ -25,7 +25,14 @@
 		if (true)
 		{
 			const elementy=[]
-			elementy[0]={kolor:"black",punkty:[[50,50],[50,650],[650,650],[650,50]],krycie:0.5}
+			elementy[0]={kolor:"black",punkty:[[100,100],[100,600],[600,600],[600,100]],krycie:0.8,rozmycie:50}
+			ekran.mapa.tlo.obraz={h:700,d:700,elementy:elementy}
+			rysuj(ekran.mapa.tlo.canvas,ekran.mapa.tlo.obraz)
+		}
+		if (true)
+		{
+			const elementy=[]
+			elementy[0]={kolor:"black",punkty:[[100,100],[100,600],[600,600],[600,100]],krycie:0.8,rozmycie:50}
 			elementy[1]={kolorLini:"green",punkty:[[300,320],[300,300],[320,300],[400,380],[400,400],[380,400]],grubosc:3}
 			elementy[2]={kolorLini:"green",punkty:[[380,300],[400,300],[400,320],[320,400],[300,400],[300,380]],grubosc:3}
 			elementy[3]={kolor:"black",punkty:[[302,302],[302,398],[398,398],[398,302]]}
@@ -122,7 +129,7 @@
 		}
 		nadanieWypelnienia()
 		{
-			if ((this.obraz_1.obraz||{elementy:[]}).elementy.length){rysuj(this.obraz_1.canvas,this.obraz_1.obraz)}
+			if (Array.isArray((this.obraz_1.obraz||{elementy:0}).elementy)){rysuj(this.obraz_1.canvas,this.obraz_1.obraz)}
 			this.dotyk.div.innerHTML=""
 			this.aktywny=1
 			for (let i=0 ; i<(this.dotyk.elementy||[]).length ; i++)
@@ -181,31 +188,17 @@
 			const lista=uzupelnianieDanych.wygladUkladow(polozenie[0][0]-2,polozenie[0][0]+2,polozenie[0][1]-2,polozenie[0][1]+2,77)
 			if (!Array.isArray(lista)){return setTimeout(()=>{pokaz.mape(proba+1)},300)}
 			//
+			ekran.mapa.obraz_1.obraz=0
+			//
 			ekran.mapa.dotyk.elementy=[]
-			ekran.mapa.korekta=[0,0]
 			ekran.mapa.ukladCentralny=0
 			ekran.mapa.ukladCentralny=uzupelnianieDanych.wygladUkladow(polozenie[0][0]-2,polozenie[0][0]+2,polozenie[0][1]-2,polozenie[0][1]+2,77)[0]
-			if (ekran.mapa.ukladCentralny && ekran.mapa.ukladCentralny.przesuniecie)
-			{
-				//korekta jest potrzebna ponieważ układy są sztucznie poprzesuwane i żeby centralny był na środku całą mapę trzeba lekkko przesunąć
-				const procent=realnePolozenieUkladu(ekran.mapa.ukladCentralny.y,ekran.mapa.ukladCentralny.x,ekran.mapa.ukladCentralny.przesuniecie)
-				for (let i=0 ; i<2 ; i++)
-				{
-					//console.log(`${"YX"[i]}: ${0.5-procent[i]}`)
-					ekran.mapa.korekta[i]=Math.round((0.5-procent[i])*100)/100
-					if (ekran.mapa.korekta[i]>0.15)
-					{
-						ekran.mapa.korekta[i]=0.15
-					}
-					else if (ekran.mapa.korekta[i]<-0.15)
-					{
-						ekran.mapa.korekta[i]=-0.15
-					}
-				}
-			}
-			const pola=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
+			//
+			ekran.mapa.pola=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
+			const korekta=[0,0]
 			for (let uklad of lista)
 			{
+				//układanie ukłądó z listy na planszę 2D
 				if (uklad.wielkosc<1 || uklad.przesuniecie<1){continue}
 				const wzgledneY=(uklad.y-polozenie[0][0])+2
 				const wzgledneX=(uklad.x-polozenie[0][1])+2
@@ -214,51 +207,76 @@
 					console.log(`błąd: ${wzgledneY} - ${wzgledneY}`)
 					continue
 				}
+				//
 				const procent=realnePolozenieUkladu(uklad.y,uklad.x,uklad.przesuniecie)
-				const srodek=[140*wzgledneY+140*(procent[0]+ekran.mapa.korekta[0]),140*wzgledneX+140*(procent[1]+ekran.mapa.korekta[1])]
-				pola[wzgledneY][wzgledneX]={elementy:[],dotyk:0}
-				pola[wzgledneY][wzgledneX].elementy.push({kolor:koloryPlanet[uklad.kolor],srodek:srodek,promien:uklad.wielkosc+2})
-				if (uklad.y!=polozenie[0][0] || uklad.x!=polozenie[0][1])
+				ekran.mapa.pola[wzgledneY][wzgledneX]={procent:procent,uklad:uklad}
+				//
+				if (wzgledneX===2 && wzgledneY===2)
 				{
-					pola[wzgledneY][wzgledneX].dotyk={y:wzgledneY*20+((procent[0]+ekran.mapa.korekta[0])*20),x:wzgledneX*20+((procent[1]+ekran.mapa.korekta[1])*20),funkcja:`zaznaczUklad(${uklad.y},${uklad.x})`}
-					if (uklad.iloscPlanet<1){debugger}
-					for (let i=0 ; i<uklad.iloscPlanet ; i++)
+					for (let i=0 ; i<2 ; i++)
 					{
-						//dodawanie planet
-						const zakresKatow=[]
-						zakresKatow[0]=Math.random()*2
-						zakresKatow[1]=zakresKatow[0]+(Math.random()*0.25)+(1.7/((i+1)*3))
-						if (zakresKatow[1]>2){zakresKatow[1]-=2}
-						pola[wzgledneY][wzgledneX].elementy.push({kolorLini:"#4d4d4d",grubosc:1,srodek:srodek,promien:(uklad.wielkosc+2)+(i*4)+5,zakresKatow:zakresKatow})
+						korekta[i]=Math.round((0.5-procent[i])*100)/100
+						if (korekta[i]>0.15)
+						{
+							korekta[i]=0.15
+						}
+						else if (korekta[i]<-0.15)
+						{
+							korekta[i]=-0.15
+						}
+					}
+				}
+			}
+			if (!(!korekta[0] && !korekta[1]))
+			{
+				//przesuwanie ukłądów zgodnie z korektą
+				for (let y=0 ; y<5 ; y++)
+				{
+					for (let x=0 ; x<5 ; x++)
+					{
+						const pole=ekran.mapa.pola[y][x]
+						if (pole)
+						{
+							pole.procent[0]+=korekta[0]
+							pole.procent[1]+=korekta[1]
+						}
 					}
 				}
 			}
 			const elementy=[]
-			for (let y=0 ; y<pola.length ; y++)
+			for (let y=0 ; y<5 ; y++)
 			{
-				for (let x=0 ; x<pola[y].length ; x++)
+				for (let x=0 ; x<5 ; x++)
 				{
-					let pole=pola[y][x]
-					if (!pole)
-					{
-						if (((y==0 || y==4) && (x==0 || x==2 || x==4)) || ((x==0 || x==4) && (y==0 || y==2 || y==4)))
-						{
-							pole={elementy:[],dotyk:{y:10+(20*y),x:10+(20*x),funkcja:`zaznaczUklad(${polozenie[0][0]+y-2},${polozenie[0][1]+x-2})`}}
-						}
-					}
+					const pole=ekran.mapa.pola[y][x]
+					const f=`zaznaczUklad(${polozenie[0][0]-2+y},${polozenie[0][1]-2+x})`
 					if (pole)
 					{
-						for (element of pole.elementy)
+						pole.srodek=[Math.round((140*y+140*pole.procent[0])*100)/100,Math.round((140*x+140*pole.procent[1])*100)/100]
+						elementy.push({kolor:koloryPlanet[pole.uklad.kolor],srodek:pole.srodek,promien:pole.uklad.wielkosc+2})
+						ekran.mapa.dotyk.elementy.push({y:y*20+((pole.procent[0])*20),x:x*20+((pole.procent[1])*20),funkcja:f})
+						if (pole.uklad.iloscPlanet<1){debugger}
+						for (let i=0 ; i<pole.uklad.iloscPlanet ; i++)
 						{
-							elementy.push(element)
+							//dodawanie planet
+							const zakresKatow=[]
+							zakresKatow[0]=Math.random()*2
+							zakresKatow[1]=zakresKatow[0]+(Math.random()*0.25)+(1.7/((i+1)*3))
+							if (zakresKatow[1]>2){zakresKatow[1]-=2}
+							elementy.push({kolorLini:"#4d4d4d",grubosc:1,srodek:pole.srodek,promien:(pole.uklad.wielkosc+2)+(i*4)+5,zakresKatow:zakresKatow})
 						}
-						ekran.mapa.dotyk.elementy.push(pole.dotyk)
+					}
+					else if (((y===0 || y===4) && (x===0 || x===2 || x===4)) || ((x===0 || x===4) && (y===0 || y===2 || y===4)))
+					{
+						//dodanie pola do kliknięcia na krańcach mapy żeby dało się zmieniać położenie widoku nawet gdy nie ma układu
+						ekran.mapa.dotyk.elementy.push({y:y*20+10,x:x*20+10,funkcja:f})
 					}
 				}
 			}
 			ekran.mapa.obraz_1.obraz={h:700,d:700,elementy:elementy}
 			//
 			setTimeout(()=>{ekran.mapa.nadajStan(1)},370)
+			setTimeout(()=>{pokaz.szczegoly()},900)
 		},
 		minimape:function(proba)
 		{
@@ -266,6 +284,8 @@
 			if (proba>20){console.log("ładowanie mapy nie powiodło się");return}
 			const lista=uzupelnianieDanych.wygladUkladow(polozenie[0][0]-17,polozenie[0][0]+17,polozenie[0][1]-17,polozenie[0][1]+17,77)
 			if (!Array.isArray(lista)){return setTimeout(()=>{pokaz.minimape(proba+1)},400)}
+			//
+			ekran.uklad.obraz_1.obraz=0
 			//
 			ekran.uklad.dotyk.elementy=[]
 			const elementy=[]
@@ -287,6 +307,50 @@
 			//
 			setTimeout(()=>{ekran.uklad.nadajStan(1)},370)
 		},
+		szczegoly:function(proba)
+		{
+			// czy odkryta, czy ktoś obecny, sos, listaUslug
+			const elementy=[]
+			ekran.mapa.obraz_2.obraz=0
+			for (let y=0 ; y<5 ; y++)
+			{
+				for (let x=0 ; x<5 ; x++)
+				{
+					const pole=ekran.mapa.pola[y][x]
+					if (!pole){continue}
+					const szczegoly=pamiec.szukaj.szczegolyUkladow()
+					if (!szczegoly){continue}
+					if (!szczegoly.odkryty)
+					{
+						elementy.push({kolor:"black",srodek:pole.srodek,promien:38,krycie:0.7,rozmycie:10})
+						continue
+					}
+					if (szczegoly.sos>0)
+					{
+						elementy.push({kolor:["black","#007fbb","#396100","#610075","#b18900","#934d00","#b10000","#f7392f"][szczegoly.sos]||"#e31b61",srodek:[pole.srodek[0]-20,pole.srodek[1]+20],promien:12})
+						if (szczegoly.sos==7)
+						{
+							elementy.push({kolor:"black",punkty:[[pole.srodek[0]-29,pole.srodek[1]+17],[pole.srodek[0]-29,pole.srodek[1]+23],[pole.srodek[0]-19,pole.srodek[1]+20]]})
+							elementy.push({kolor:"black",srodek:[pole.srodek[0]-12,pole.srodek[1]+20],promien:2})
+						}
+						else
+						{
+							elementy.push({kolor:"white",punkty:[[pole.srodek[0]-29,pole.srodek[1]+17],[pole.srodek[0]-29,pole.srodek[1]+23],[pole.srodek[0]-19,pole.srodek[1]+20]]})
+							elementy.push({kolor:"white",srodek:[pole.srodek[0]-12,pole.srodek[1]+20],promien:2})
+						}
+					}
+					if (szczegoly.gildia)
+					{
+						const kolor=pamiec.pamiec.gildie[szczegoly.gildia].kolor
+						elementy.push({kolor:kolor,punkty:[[pole.srodek[0]+15,pole.srodek[1]+16],[pole.srodek[0]+15,pole.srodek[1]+24],[pole.srodek[0]+20,pole.srodek[1]+24],[pole.srodek[0]+25,pole.srodek[1]+20],[pole.srodek[0]+20,pole.srodek[1]+16]]})
+					}
+					console.log(pole.srodek)
+				}
+			}
+			ekran.mapa.obraz_2.obraz={d:700,h:700,elementy:elementy}
+			rysuj(ekran.mapa.obraz_2.canvas,ekran.mapa.obraz_2.obraz)
+			ekran.mapa.obraz_2.canvas.style.opacity=1
+		}
 	}
 	uzupelnianieDanych=
 	{
@@ -324,6 +388,10 @@
 				return 0
 			}
 			return obecne
+		},
+		szczegolyUkladow:function(lista)
+		{
+			//
 		}
 	}
 	serwer=
@@ -336,22 +404,22 @@
 				for (uklad of lista)
 				{
 					//funkcja testowa, losuje ukłądy i zwraca jak serwer
-					let s;
-					if (Math.random()<0.1 || Math.random()<punkt(uklad[0],uklad[1])/7)
+					let s=koduj.adres(uklad[0],uklad[1],0,1)
+					if (Math.random()<0.05 || Math.random()<(punkt(uklad[0],uklad[1])/40))
 					{
 						if (!(uklad[0]>-1 && uklad[0]<700 && uklad[1]>-1 && uklad[1]<700))
 						{
 							//kiedy pytanie o ukłąd poza planszą zwraca brak
-							s=koduj.wygladUkladu(uklad[0],uklad[1],1,0,0,0)
+							s+=koduj.wygladUkladu(1,0,0,0)
 						}
 						else
 						{
-							s=koduj.wygladUkladu(uklad[0],uklad[1],los(1,4),los(1,9),los(0,11),los(1,7))
+							s+=koduj.wygladUkladu(los(1,4),los(1,9),los(0,11),los(1,7))
 						}
 					}
 					else
 					{
-						s=koduj.wygladUkladu(uklad[0],uklad[1],1,0,0,0)
+						s+=koduj.wygladUkladu(1,0,0,0)
 					}
 					zwrotka+=s
 				}
@@ -379,7 +447,8 @@
 	{
 		pamiec:
 		{
-			wygladUkladow:[[],[],[],[],[],[],[],[],[]]
+			wygladUkladow:[[],[],[],[],[],[],[],[],[]],
+			gildie:[{nazwa:"wolni",kolor:"black"},{nazwa:"Pax",kolor:"#1b93ed"},{nazwa:"Saguarianie",kolor:"#ffc54d"},{nazwa:"kurczeraz",kolor:"#e34d25"}]
 		},
 		adres:
 		{
@@ -395,9 +464,9 @@
 		{
 			wygladUkladow:function(s)
 			{
-				const uklad=odkoduj.wygladUkladu(s)
-				const {nrListy,pozycja}=pamiec.adres.wygladUkladow(uklad.y,uklad.x)
-				pamiec.pamiec.wygladUkladow[nrListy][pozycja]={y:uklad.y,x:uklad.x,uklad:s}
+				const adres=odkoduj.adres(s.slice(0,4))
+				const {nrListy,pozycja}=pamiec.adres.wygladUkladow(adres.y,adres.x)
+				pamiec.pamiec.wygladUkladow[nrListy][pozycja]={y:adres.y,x:adres.x,u:s.slice(4,6)}
 			}
 		},
 		szukaj:
@@ -412,8 +481,16 @@
 				let uklad=pamiec.pamiec.wygladUkladow[nrListy][pozycja]
 				if (!uklad || typeof uklad!="object"){return 0}
 				if (!(uklad.y==y && uklad.x==x)){return 0}
-				uklad=odkoduj.wygladUkladu(uklad.uklad)
+				uklad=odkoduj.wygladUkladu(uklad.u)
+				uklad.y=y
+				uklad.x=x
 				return uklad
+			},
+			szczegolyUkladow:function(y,x)
+			{
+				let sos=0
+				if (Math.random()<0.1){sos=los(1,7)}
+				return {odkryty:los(0,1),obecnosc:los(0,1),gildia:los(0,3),sos:sos,uslugi:[]}
 			}
 		},
 	}
@@ -443,10 +520,9 @@
 	}
 	function punkt(y,x)
 	{
-		//funkcja do testowego generowania galaktyki na bierząco
 		const mocSkrecenia=15
-		const szerokoscRamienia=1.47
-		const gasniecie=0.077
+		const szerokoscRamienia=1.57
+		const gasniecie=0.027
 		//
 		const odl_1=odleglosc([y,x],[350,350])
 		let zacienienie=0
@@ -471,11 +547,11 @@
 				zacienienie=Math.max(zacienienie,gestosc)
 			}
 		}
-		zacienienie*=7
-		zacienienie=zacienienie/(Math.pow(Math.max(odl_1-77,0)*gasniecie,1.5)+1)//wyciemnienie brzegów
-		zacienienie+=Math.pow(1/((odl_1/70)+1),3)*1//rozjaśnienie środka
-		zacienienie+=(1/((odl_1*gasniecie)+1))//rozmycie liniowe
-		return zacienienie
+		zacienienie*=60
+		zacienienie=zacienienie/(Math.pow(Math.max(odl_1-10,0)*gasniecie,1.1)+1)//wyciemnienie brzegów
+		zacienienie+=Math.pow(1/((odl_1/70)+1),3)*20//rozjaśnienie środka
+		zacienienie+=(10/((odl_1*gasniecie)+1))//rozmycie liniowe
+		return Math.floor(zacienienie)
 		function odleglosc(p1,p2)
 		{
 			y=Math.pow(p1[0]-p2[0],2)
@@ -489,8 +565,8 @@
 	<div id="tlo"></div>
 	<div id="kontent"></div>
 	<div id="sztucznaStopka"></div>
+	<div id="oknoMenu"><div id="tloMenu"></div><div id="ramyMenu"><div id="ramaMenu1"></div><div id="ramaMenu2"></div></div><div id="kontentMenu"></div></div>
 	<div class="pas" id="pas1"><div class="kontentPas"></div></div></div>
 	<div class="pas" id="pas2"><div class="kontentPas"></div></div></div>
-	<div id="oknoMenu"><div id="tloMenu"></div><div id="ramyMenu"><div id="ramaMenu1"></div><div id="ramaMenu2"></div></div><div id="kontentMenu"></div></div>
 </body>
 </html>
