@@ -95,9 +95,9 @@ const koduj=
 		}
 		return s
 	},
-	wygladUkladu:function(y,x,wielkosc,przesuniecie,kolor,iloscPlanet)
+	wygladUkladu:function(wielkosc,przesuniecie,kolor,iloscPlanet)
 	{
-		let szyfr=koduj.adres(y,x,0,1)
+		let szyfr=""
 		//Yukladu,Xukladu,planeta,polePlanety
 		//testowanie
 		if (!(kolor>-1 && kolor<12 && przesuniecie>-1 && przesuniecie<10 && iloscPlanet>-1 && iloscPlanet<8 && wielkosc>0 && wielkosc<5))
@@ -200,12 +200,12 @@ const odkoduj=
 	},
 	wygladUkladu:function(szyfr)
 	{
-		const wygladUkladu=odkoduj.adres(szyfr.slice(0,4))
+		const wygladUkladu={}
 		let l=0
-		for (let i=4 ; i<6 ; i++)
+		for (let i=0 ; i<2 ; i++)
 		{
 			const znak={q:0,w:1,e:2,r:3,t:4,y:5,u:6,i:7,o:8,p:9,a:10,s:11,d:12,f:13,g:14,h:15,j:16,k:17,l:18,z:19,x:20,c:21,v:22,b:23,n:24,m:25,Q:26,W:27,E:28,R:29,T:30,Y:31,U:32,I:33,O:34,P:35,A:36,S:37,D:38,F:39,G:40,H:41,J:42,K:43,L:44,Z:45,X:46,C:47,V:48,B:49,N:50,M:51,1:52,2:53,3:54,4:55,5:56,6:57,7:58,8:59,9:60,0:61,"+":62}[szyfr[i]]
-			l+=(znak*Math.pow(63,5-i))
+			l+=(znak*Math.pow(63,1-i))
 		}
 		for (let i=0 ; i<4 ; i++)
 		{
