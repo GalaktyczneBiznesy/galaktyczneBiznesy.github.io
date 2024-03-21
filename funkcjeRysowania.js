@@ -10,7 +10,10 @@ function rysuj(plutno,budowaObrazka)
 		ctx.lineWidth=element.grubosc||0
 		ctx.strokeStyle=element.kolorLini||`rgba(0,0,0,0)`
 		ctx.fillStyle=element.kolor||`rgba(0,0,0,0)`
-		ctx.filter=`blur(${element.rozmycie||0}px)`
+		if (element.rozmycie)
+		{
+			ctx.filter=`blur(${element.rozmycie||0}px)`
+		}
 		ctx.beginPath()
 		if (Array.isArray(element.srodek) && element.promien>0)
 		{
@@ -45,5 +48,9 @@ function rysuj(plutno,budowaObrazka)
 			ctx.stroke()
 		}
 		ctx.closePath()
+		if (element.rozmycie)
+		{
+			ctx.filter=`none`
+		}
 	}
 }
