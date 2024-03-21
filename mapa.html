@@ -206,10 +206,8 @@
 		{
 			if (this.stan==1 && this.zmiana==0)
 			{
-				console.log("ee")
 				for (let nazwa in this.canvas)
 				{
-					console.log(nazwa,this.canvas[nazwa].gotowe,this.canvas[nazwa].pokazane)
 					if (this.canvas[nazwa].gotowe && !this.canvas[nazwa].pokazane)
 					{
 						this.canvas[nazwa].canvas.style.transition="0.3s"
@@ -230,7 +228,11 @@
 	}
 	function zaznaczUklad(y,x)
 	{
-		if (!(y>-1 && y<700 && x>-1 && x<700)){return}
+		if (!(y>-1 && y<700 && x>-1 && x<700))
+		{
+			setTimeout(()=>{ekran.mapa.aktywny=1},100)
+			return
+		}
 		polozenie.unshift([y,x])
 		polozenie=polozenie.slice(0,57)
 		uzupelnianieDanych.wygladUkladow(y-19,y+19,x-19,x+19)
@@ -240,7 +242,27 @@
 			ekran.uklad.nadajStan(0)
 			pokaz.mape()
 			pokaz.minimape()
+			if (!menu.guziki[1][0].aktywny)
+			{
+				menu.guziki[1][0].odswiez({aktywny:1,funkcja:"cofnij()",zaznaczony:0})
+			}
 		},150)
+	}
+	function cofnij()
+	{
+		if (polozenie.length<3)
+		{
+			menu.guziki[1][0].odswiez({aktywny:0,funkcja:"",zaznaczony:0})
+		}
+		if (polozenie.length<2){debugger;return}
+		polozenie=polozenie.slice(1)
+		const y=polozenie[0][0]
+		const x=polozenie[0][1]
+		uzupelnianieDanych.wygladUkladow(y-19,y+19,x-19,x+19)
+		ekran.mapa.nadajStan(0)
+		ekran.uklad.nadajStan(0)
+		pokaz.mape()
+		pokaz.minimape()
 	}
 	pokaz=
 	{
@@ -401,12 +423,15 @@
 							elementy.push({kolor:"white",srodek:[pole.srodek[0]-12,pole.srodek[1]+20],promien:2})
 						}
 					}
+					else if (szczegoly.obecnosc)
+					{
+						elementy.push({kolor:"#4df707",srodek:[pole.srodek[0]-20,pole.srodek[1]+20],promien:4})
+					}
 					if (szczegoly.gildia)
 					{
 						const kolor=pamiec.pamiec.gildie[szczegoly.gildia].kolor
 						elementy.push({kolor:kolor,punkty:[[pole.srodek[0]+15,pole.srodek[1]+16],[pole.srodek[0]+15,pole.srodek[1]+24],[pole.srodek[0]+20,pole.srodek[1]+24],[pole.srodek[0]+25,pole.srodek[1]+20],[pole.srodek[0]+20,pole.srodek[1]+16]]})
 					}
-					console.log(pole.srodek)
 				}
 			}
 			ekran.mapa.canvas.szczegoly.obraz={d:700,h:700,elementy:elementy}
