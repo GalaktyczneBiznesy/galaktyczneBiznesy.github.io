@@ -26,8 +26,8 @@
 		{
 			const elementy=[]
 			elementy[0]={kolor:"black",punkty:[[100,100],[100,600],[600,600],[600,100]],krycie:0.8,rozmycie:50}
-			ekran.mapa.tlo.obraz={h:700,d:700,elementy:elementy}
-			rysuj(ekran.mapa.tlo.canvas,ekran.mapa.tlo.obraz)
+			ekran.mapa.canvas.tlo.obraz={h:700,d:700,elementy:elementy}
+			ekran.mapa.pokaz("tlo")
 		}
 		if (true)
 		{
@@ -36,13 +36,16 @@
 			elementy[1]={kolorLini:"green",punkty:[[300,320],[300,300],[320,300],[400,380],[400,400],[380,400]],grubosc:3}
 			elementy[2]={kolorLini:"green",punkty:[[380,300],[400,300],[400,320],[320,400],[300,400],[300,380]],grubosc:3}
 			elementy[3]={kolor:"black",punkty:[[302,302],[302,398],[398,398],[398,302]]}
-			ekran.uklad.tlo.obraz={h:700,d:700,elementy:elementy}
-			rysuj(ekran.uklad.tlo.canvas,ekran.uklad.tlo.obraz)
+			ekran.uklad.canvas.tlo.obraz={h:700,d:700,elementy:elementy}
+			ekran.uklad.pokaz("tlo")
 		}
+		ekran.mapa.canvas.wyglad.odswiezaj=1
+		ekran.mapa.canvas.szczegoly.odswiezaj=1
+		ekran.uklad.canvas.obraz_1.odswiezaj=1
 	}
 	class Ekran
 	{
-		constructor(nazwa)
+		constructor(nazwa,canvas,interaktywne)
 		{
 			this.nazwa=nazwa
 			this.div=document.createElement("div")
@@ -53,15 +56,12 @@
 	    	this.zmiana=0
 	    	this.aktywny=1
 	    	//
-			this.tlo={obraz:0,canvas:document.createElement("canvas")}
-			this.tlo.canvas.className="ekranWypelnienie"
-			this.obraz_1={obraz:0,canvas:document.createElement("canvas")}
-			this.obraz_1.canvas.className="ekranWypelnienie"
-			this.obraz_2={obraz:0,canvas:document.createElement("canvas")}
-			this.obraz_2.canvas.className="ekranWypelnienie"
-			this.obraz_2.canvas.style.transition="0.2s"
-			this.interaktywne={elementy:0,div:document.createElement("div")}
-			this.interaktywne.div.className="ekranWypelnienie"
+	    	this.canvas={}
+	    	for (let nazwa of canvas)
+	    	{
+	    		this.nowyCanvas(nazwa)
+	    	}
+	    	this.interaktywne={}
 			this.dotyk={elementy:[],div:document.createElement("div")}
 			this.dotyk.div.className="ekranWypelnienie"
 			//
@@ -84,13 +84,31 @@
 	    		this.narozniki.push(naroznik)
 	    		this.div.appendChild(naroznik.div)
 	    	}
-	    	this.div.appendChild(this.tlo.canvas)
-	    	this.div.appendChild(this.obraz_1.canvas)
-	    	this.div.appendChild(this.obraz_2.canvas)
-	    	this.div.appendChild(this.interaktywne.div)
+	    	for (let nazwa in this.canvas)
+			{
+				this.div.appendChild(this.canvas[nazwa].canvas)
+			}
 	    	this.div.appendChild(this.dotyk.div)
 	    	//
 	    	this.nadajStan(0)
+	    	this.petla()
+		}
+		nowyCanvas(nazwa)
+		{
+			const canvas={}
+			canvas.canvas=document.createElement("canvas")
+			canvas.canvas.className="ekranWypelnienie"
+			canvas.canvas.style.opacity=0
+			canvas.obraz=0
+			canvas.gotowe=0
+			canvas.pokazane=0
+			canvas.gladkie=0
+			canvas.odswiezaj=0
+			this.canvas[nazwa]=canvas
+		}
+		noweInteraktywne()
+		{
+			//
 		}
 		nadajStan(stan)
 		{
@@ -103,8 +121,15 @@
 			if (stan){this.nadanieWypelnienia()}
 			else
 			{
-				this.interaktywne.div.innerHTML=""
-				this.obraz_2.canvas.style.opacity=0
+				for (let nazwa in this.canvas)
+				{
+					if (this.canvas[nazwa].odswiezaj)
+					{
+						this.canvas[nazwa].obraz=0
+						this.canvas[nazwa].gotowe=0
+						this.canvas[nazwa].pokazane=0
+					}
+				}
 			}
 			setTimeout(()=>{this.krycieWypelnienia(stan)},[1,310][stan])
 			setTimeout(()=>{this.stanNaroznikow(stan)},[50,1][stan])
@@ -112,9 +137,17 @@
 		}
 		krycieWypelnienia(stan)
 		{
-			this.tlo.canvas.style.opacity=stan
-			this.obraz_1.canvas.style.opacity=stan
-			this.interaktywne.div.style.opacity=stan
+			for (let nazwa in this.canvas)
+			{
+				if (stan && this.canvas[nazwa].gotowe)
+				{
+					this.canvas[nazwa].canvas.style.opacity=1
+				}
+				else
+				{
+					this.canvas[nazwa].canvas.style.opacity=0
+				}
+			}
 			this.dotyk.div.style.opacity=stan
 		}
 		stanNaroznikow(stan)
@@ -129,7 +162,6 @@
 		}
 		nadanieWypelnienia()
 		{
-			if (Array.isArray((this.obraz_1.obraz||{elementy:0}).elementy)){rysuj(this.obraz_1.canvas,this.obraz_1.obraz)}
 			this.dotyk.div.innerHTML=""
 			this.aktywny=1
 			for (let i=0 ; i<(this.dotyk.elementy||[]).length ; i++)
@@ -159,11 +191,42 @@
 	    		console.log("nieznany typ funkcji")
 	    	}
 		}
+		pokaz(nazwa)
+		{
+			if (this.canvas[nazwa].obraz)
+			{
+				setTimeout(()=>
+				{
+					rysuj(this.canvas[nazwa].canvas,this.canvas[nazwa].obraz)
+					setTimeout(()=>{this.canvas[nazwa].gotowe=1},50)
+				},100)
+			}
+		}
+		petla()
+		{
+			if (this.stan==1 && this.zmiana==0)
+			{
+				console.log("ee")
+				for (let nazwa in this.canvas)
+				{
+					console.log(nazwa,this.canvas[nazwa].gotowe,this.canvas[nazwa].pokazane)
+					if (this.canvas[nazwa].gotowe && !this.canvas[nazwa].pokazane)
+					{
+						this.canvas[nazwa].canvas.style.transition="0.3s"
+						this.aktywny=0
+						this.canvas[nazwa].pokazane=1
+						setTimeout(()=>{this.canvas[nazwa].canvas.style.opacity=1},1)
+						setTimeout(()=>{this.aktywny=1;this.canvas[nazwa].canvas.style.transition="none"},300)
+					}
+				}
+			}
+			setTimeout(()=>{this.petla()},700)
+		}
 	}
 	const ekran=
 	{
-		mapa: new Ekran("mapa"),
-		uklad: new Ekran("uklad"),
+		mapa: new Ekran("mapa",["tlo","wyglad","szczegoly"]),
+		uklad: new Ekran("uklad",["tlo","obraz_1"]),
 	}
 	function zaznaczUklad(y,x)
 	{
@@ -187,8 +250,6 @@
 			if (proba>27){console.log("ładowanie mapy nie powiodło się");return}
 			const lista=uzupelnianieDanych.wygladUkladow(polozenie[0][0]-2,polozenie[0][0]+2,polozenie[0][1]-2,polozenie[0][1]+2,77)
 			if (!Array.isArray(lista)){return setTimeout(()=>{pokaz.mape(proba+1)},300)}
-			//
-			ekran.mapa.obraz_1.obraz=0
 			//
 			ekran.mapa.dotyk.elementy=[]
 			ekran.mapa.ukladCentralny=0
@@ -259,11 +320,13 @@
 						for (let i=0 ; i<pole.uklad.iloscPlanet ; i++)
 						{
 							//dodawanie planet
+							const promien=(pole.uklad.wielkosc+2)+(i*4)+5
 							const zakresKatow=[]
 							zakresKatow[0]=Math.random()*2
 							zakresKatow[1]=zakresKatow[0]+(Math.random()*0.25)+(1.7/((i+1)*3))
 							if (zakresKatow[1]>2){zakresKatow[1]-=2}
-							elementy.push({kolorLini:"#4d4d4d",grubosc:1,srodek:pole.srodek,promien:(pole.uklad.wielkosc+2)+(i*4)+5,zakresKatow:zakresKatow})
+							elementy.push({kolorLini:"#4d4d4d",grubosc:1,srodek:pole.srodek,promien:promien,zakresKatow:zakresKatow})
+							elementy.push({kolor:"#616161",srodek:[pole.srodek[0]+Math.sin(zakresKatow[0]*Math.PI)*promien,pole.srodek[1]+Math.cos(zakresKatow[0]*Math.PI)*promien],promien:1.5})
 						}
 					}
 					else if (((y===0 || y===4) && (x===0 || x===2 || x===4)) || ((x===0 || x===4) && (y===0 || y===2 || y===4)))
@@ -273,7 +336,8 @@
 					}
 				}
 			}
-			ekran.mapa.obraz_1.obraz={h:700,d:700,elementy:elementy}
+			ekran.mapa.canvas.wyglad.obraz={h:700,d:700,elementy:elementy}
+			ekran.mapa.pokaz("wyglad")
 			//
 			setTimeout(()=>{ekran.mapa.nadajStan(1)},370)
 			setTimeout(()=>{pokaz.szczegoly()},900)
@@ -284,8 +348,6 @@
 			if (proba>20){console.log("ładowanie mapy nie powiodło się");return}
 			const lista=uzupelnianieDanych.wygladUkladow(polozenie[0][0]-17,polozenie[0][0]+17,polozenie[0][1]-17,polozenie[0][1]+17,77)
 			if (!Array.isArray(lista)){return setTimeout(()=>{pokaz.minimape(proba+1)},400)}
-			//
-			ekran.uklad.obraz_1.obraz=0
 			//
 			ekran.uklad.dotyk.elementy=[]
 			const elementy=[]
@@ -301,9 +363,10 @@
 				}
 				const procent=realnePolozenieUkladu(uklad.y,uklad.x,uklad.przesuniecie)
 				const kolor=((uklad.wielkosc*10)+uklad.iloscPlanet)*4
-				elementy.push({kolor:`rgba(${kolor},${kolor},${kolor})`,srodek:[20*wzgledneY+20*procent[0],20*wzgledneX+20*procent[1]],promien:(uklad.wielkosc/4)+1.5})
+				elementy.push({kolor:`rgba(${kolor+67},${kolor+57},${kolor})`,srodek:[20*wzgledneY+20*procent[0],20*wzgledneX+20*procent[1]],promien:(uklad.wielkosc/4)+1.5})
 			}
-			ekran.uklad.obraz_1.obraz={h:700,d:700,elementy:elementy}
+			ekran.uklad.canvas.obraz_1.obraz={h:700,d:700,elementy:elementy}
+			ekran.uklad.pokaz("obraz_1")
 			//
 			setTimeout(()=>{ekran.uklad.nadajStan(1)},370)
 		},
@@ -311,7 +374,6 @@
 		{
 			// czy odkryta, czy ktoś obecny, sos, listaUslug
 			const elementy=[]
-			ekran.mapa.obraz_2.obraz=0
 			for (let y=0 ; y<5 ; y++)
 			{
 				for (let x=0 ; x<5 ; x++)
@@ -322,7 +384,7 @@
 					if (!szczegoly){continue}
 					if (!szczegoly.odkryty)
 					{
-						elementy.push({kolor:"black",srodek:pole.srodek,promien:38,krycie:0.7,rozmycie:10})
+						elementy.push({kolor:"black",srodek:pole.srodek,promien:38,krycie:0.5,rozmycie:10})
 						continue
 					}
 					if (szczegoly.sos>0)
@@ -347,9 +409,8 @@
 					console.log(pole.srodek)
 				}
 			}
-			ekran.mapa.obraz_2.obraz={d:700,h:700,elementy:elementy}
-			rysuj(ekran.mapa.obraz_2.canvas,ekran.mapa.obraz_2.obraz)
-			ekran.mapa.obraz_2.canvas.style.opacity=1
+			ekran.mapa.canvas.szczegoly.obraz={d:700,h:700,elementy:elementy}
+			ekran.mapa.pokaz("szczegoly")
 		}
 	}
 	uzupelnianieDanych=
