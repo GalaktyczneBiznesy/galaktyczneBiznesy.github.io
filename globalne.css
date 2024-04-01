@@ -179,3 +179,11 @@ body
 	border-bottom: solid 0.5vh var(--zaznaczony1);
 	opacity: 1;
 }
+@keyframes rotate {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
