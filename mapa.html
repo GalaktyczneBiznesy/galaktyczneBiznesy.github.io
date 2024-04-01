@@ -11,7 +11,6 @@
 <script src="funkcjeKodowania.js"></script>
 <script src="funkcjeRysowania.js"></script>
 <script type="text/javascript">
-	const koloryPlanet=["#e3392f","#f7574d","#f77f6b","#f7b175","#f7edb1","#f7894d","#f7bbb1","#b1e3f7","#e3f7f7","#cfedf7","#f7e339","#f7f793"]
 	let polozenie=[[350,350]]
 	function start()
 	{
@@ -20,7 +19,7 @@
 		document.getElementById("kontent").appendChild(ekran.mapa.div)
 		document.getElementById("kontent").appendChild(ekran.uklad.div)
 		setTimeout(()=>{menu.guziki[0][2].odswiez({aktywny:1,menu:'test',zaznaczony:1})},4000)
-		setTimeout(()=>{menu.guziki[0][1].odswiez({aktywny:1,funkcja:'alert("i co mnie klikasz tutej")',zaznaczony:0})},4000)
+		setTimeout(()=>{menu.guziki[0][1].odswiez({aktywny:1,funkcja:'alert("i co mnie klikasz tutej zaraz Ciebie kliknę")',zaznaczony:0})},4000)
 		setTimeout(()=>{zaznaczUklad(352,352)},500)
 		if (true)
 		{
@@ -163,7 +162,7 @@
 		nadanieWypelnienia()
 		{
 			this.dotyk.div.innerHTML=""
-			this.aktywny=1
+			setTimeout(()=>{this.aktywny=1},700)
 			for (let i=0 ; i<(this.dotyk.elementy||[]).length ; i++)
 			{
 				const zaznacznik=document.createElement("div")
@@ -336,7 +335,8 @@
 					if (pole)
 					{
 						pole.srodek=[Math.round((140*y+140*pole.procent[0])*100)/100,Math.round((140*x+140*pole.procent[1])*100)/100]
-						elementy.push({kolor:koloryPlanet[pole.uklad.kolor],srodek:pole.srodek,promien:pole.uklad.wielkosc+2})
+						elementy.push({kolor:`hsl(${60-Math.floor(Math.pow(12-pole.uklad.kolor,3)/28.8)},${100}%,${77}%)`,srodek:pole.srodek,promien:pole.uklad.wielkosc+5,rozmycie:14})
+						elementy.push({kolor:`hsl(${60-Math.floor(Math.pow(12-pole.uklad.kolor,3)/28.8)},${100}%,${35+Math.floor(Math.pow(pole.uklad.kolor+1,2)/2.4)}%)`,srodek:pole.srodek,promien:pole.uklad.wielkosc+2})
 						ekran.mapa.dotyk.elementy.push({y:y*20+((pole.procent[0])*20),x:x*20+((pole.procent[1])*20),funkcja:f})
 						if (pole.uklad.iloscPlanet<1){debugger}
 						for (let i=0 ; i<pole.uklad.iloscPlanet ; i++)
@@ -362,7 +362,7 @@
 			ekran.mapa.pokaz("wyglad")
 			//
 			setTimeout(()=>{ekran.mapa.nadajStan(1)},370)
-			setTimeout(()=>{pokaz.szczegoly()},900)
+			setTimeout(()=>{pokaz.szczegoly()},1050)
 		},
 		minimape:function(proba)
 		{
@@ -395,6 +395,7 @@
 		szczegoly:function(proba)
 		{
 			// czy odkryta, czy ktoś obecny, sos, listaUslug
+
 			const elementy=[]
 			for (let y=0 ; y<5 ; y++)
 			{
@@ -402,35 +403,32 @@
 				{
 					const pole=ekran.mapa.pola[y][x]
 					if (!pole){continue}
+					const cy=pole.srodek[0]
+					const cx=pole.srodek[1]
 					const szczegoly=pamiec.szukaj.szczegolyUkladow()
 					if (!szczegoly){continue}
 					if (!szczegoly.odkryty)
 					{
-						elementy.push({kolor:"black",srodek:pole.srodek,promien:38,krycie:0.5,rozmycie:10})
+						elementy.push({kolor:"black",srodek:pole.srodek,promien:38,krycie:0.4,rozmycie:10})
 						continue
 					}
 					if (szczegoly.sos>0)
 					{
-						elementy.push({kolor:["black","#007fbb","#396100","#610075","#b18900","#934d00","#b10000","#f7392f"][szczegoly.sos]||"#e31b61",srodek:[pole.srodek[0]-20,pole.srodek[1]+20],promien:12})
-						if (szczegoly.sos==7)
-						{
-							elementy.push({kolor:"black",punkty:[[pole.srodek[0]-29,pole.srodek[1]+17],[pole.srodek[0]-29,pole.srodek[1]+23],[pole.srodek[0]-19,pole.srodek[1]+20]]})
-							elementy.push({kolor:"black",srodek:[pole.srodek[0]-12,pole.srodek[1]+20],promien:2})
-						}
-						else
-						{
-							elementy.push({kolor:"white",punkty:[[pole.srodek[0]-29,pole.srodek[1]+17],[pole.srodek[0]-29,pole.srodek[1]+23],[pole.srodek[0]-19,pole.srodek[1]+20]]})
-							elementy.push({kolor:"white",srodek:[pole.srodek[0]-12,pole.srodek[1]+20],promien:2})
-						}
+						elementy.push({kolor:"black",srodek:[cy-22,cx+22],promien:12})
+						elementy.push({kolorLini:["black","#007fbb","#396100","#610075","#b18900","#934d00","#b10000","#f7392f"][szczegoly.sos]||"#e31b61",grubosc:2,srodek:[cy-22,cx+22],promien:12})
+						elementy.push({kolor:"#b1b1b1",punkty:[[cy-31,cx+19],[cy-31,cx+25],[cy-21,cx+22]]})
+						elementy.push({kolor:"#b1b1b1",srodek:[cy-14,cx+22],promien:2})
 					}
 					else if (szczegoly.obecnosc)
 					{
-						elementy.push({kolor:"#4df707",srodek:[pole.srodek[0]-20,pole.srodek[1]+20],promien:4})
+						elementy.push({kolor:"#397f11",srodek:[cy-22,pole.srodek[1]+22],promien:3})
 					}
 					if (szczegoly.gildia)
 					{
 						const kolor=pamiec.pamiec.gildie[szczegoly.gildia].kolor
-						elementy.push({kolor:kolor,punkty:[[pole.srodek[0]+15,pole.srodek[1]+16],[pole.srodek[0]+15,pole.srodek[1]+24],[pole.srodek[0]+20,pole.srodek[1]+24],[pole.srodek[0]+25,pole.srodek[1]+20],[pole.srodek[0]+20,pole.srodek[1]+16]]})
+						const punkty=[[cy+17,cx+18],[cy+18,cx+22],[cy+17,cx+26],[cy+22,cx+27],[cy+28,cx+22],[cy+22,cx+17]]
+						elementy.push({kolor:kolor,krycie:0.1,punkty:punkty})
+						elementy.push({kolorLini:kolor,grubosc:1,punkty:punkty})
 					}
 				}
 			}
