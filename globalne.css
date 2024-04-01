@@ -52,8 +52,8 @@ body
 .gwiazdaTla
 {
 	position: absolute;
-	width: 4px;
-	height: 4px;
+	width: 0.4vh;
+	height: 0.4vh;
 	background: white;
 	opacity: 0;
 }
