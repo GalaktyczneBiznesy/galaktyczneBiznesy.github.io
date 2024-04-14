@@ -104,7 +104,7 @@ const koduj=
 		{
 			console.log("błąd")
 			debugger
-			return 'qqqqqq'
+			return 'qqqq'
 		}
 		//koniec testowania
 		let l=(kolor*320)+(przesuniecie*32)+(iloscPlanet*4)+(wielkosc-1)
