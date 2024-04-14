@@ -3,79 +3,111 @@
 <head>
 <title>Galaktyczne Biznesy</title>
 <meta charset="utf-8" />
-<link rel="stylesheet" href="globalne.css">
-<link rel="stylesheet" href="kolory.css">
-<link rel="stylesheet" href="mapa.css">
+<link rel="stylesheet" href="style.css">
 <script src="funkcjeTla.js"></script>
 <script src="funkcjeMenu.js"></script>
 <script src="funkcjeKodowania.js"></script>
 <script src="funkcjeRysowania.js"></script>
+<script src="wygladUkladow.js"></script>
 <script type="text/javascript">
-	let polozenie=[[350,350]]
 	function start()
 	{
+		funkcjeMotywow.nadaj()
+		for (let nr=0 ; nr<2 ; nr++)
+		{
+			ekran[nr].ekran = new Ekran(nr+1)
+		}
 		tlo.zaladuj()
 		menu.zaladuj()
-		document.getElementById("kontent").appendChild(ekran.mapa.div)
-		document.getElementById("kontent").appendChild(ekran.uklad.div)
+		//
 		setTimeout(()=>{menu.guziki[0][2].odswiez({aktywny:1,menu:'test',zaznaczony:1})},4000)
+		setTimeout(()=>{menu.guziki[1][0].odswiez({aktywny:1,funkcja:"let nr=funkcjeMotywow.nr+1;if(nr>funkcjeMotywow.motywy.length-1){nr=0}funkcjeMotywow.zmien(nr)",zaznaczony:0})},4000)
 		setTimeout(()=>{menu.guziki[0][1].odswiez({aktywny:1,funkcja:'alert("i co mnie klikasz tutej zaraz Ciebie kliknę")',zaznaczony:0})},4000)
-		setTimeout(()=>{zaznaczUklad(352,352)},500)
-		if (true)
+		setTimeout(()=>
 		{
-			const elementy=[]
-			elementy[0]={kolor:"black",punkty:[[100,100],[100,600],[600,600],[600,100]],krycie:0.9,rozmycie:50}
-			for (let b=1 ; b<18 ; b++)
+			ekran[0].widoki[ekran[0].aktywnyWidok].start()
+			ekran[1].widoki[ekran[1].aktywnyWidok].start()
+		},400)
+	}
+	const funkcjeMotywow=
+	{
+		nr:0,
+		motywy:
+		[
 			{
-				elementy.push({kolorLini:"#112500",grubosc:1,punkty:[[20,b*20],[20,700-(b*20)],[680,700-(b*20)],[680,b*20]]})
-			}
-			for (let b=1 ; b<18 ; b++)
+				nazwa:"zielony",
+				pasTlo: "#071100",
+				menuObwod: "rgba(7,17,0,0.8)",
+				ramy1: "#4df707",
+				ramy2: "#43b111",
+				ramy3: "#397f11",
+				zaznaczony1: "#ff6107",
+				zaznaczony2: "#ff6107",
+				zaznaczony3: "#ff6107",
+				siatka: "#112f00",
+			},
 			{
-				elementy.push({kolorLini:"#112500",grubosc:1,punkty:[[b*20,20],[700-(b*20),20],[700-(b*20),680],[b*20,680]]})
+				nazwa:"złoty",
+				pasTlo: "#615700",
+				menuObwod: "rgba(97,87,0,0.8)",
+				ramy1: "#f7d91b",
+				ramy2: "#e3c507",
+				ramy3: "#b19d07",
+				zaznaczony1: "#f74d1b",
+				zaznaczony2: "#f73907",
+				zaznaczony3: "#d93907",
+				siatka: "#4d2f00",
 			}
-			ekran.mapa.canvas.tlo.obraz={h:700,d:700,elementy:elementy}
-			ekran.mapa.pokaz("tlo")
-		}
-		if (true)
+		],
+		wybrany:
 		{
-			const elementy=[]
-			elementy[0]={kolor:"black",punkty:[[100,100],[100,600],[600,600],[600,100]],krycie:0.9,rozmycie:50}
-			elementy[1]={kolorLini:"green",punkty:[[300,320],[300,300],[320,300],[400,380],[400,400],[380,400]],grubosc:3}
-			elementy[2]={kolorLini:"green",punkty:[[380,300],[400,300],[400,320],[320,400],[300,400],[300,380]],grubosc:3}
-			elementy[3]={kolor:"black",punkty:[[302,302],[302,398],[398,398],[398,302]]}
-			ekran.uklad.canvas.tlo.obraz={h:700,d:700,elementy:elementy}
-			ekran.uklad.pokaz("tlo")
+			nazwa:"domyślny",
+			pasTlo: "#071100",
+			menuObwod: "rgba(7,17,0,0.8)",
+			ramy1: "#4df707",
+			ramy2: "#43b111",
+			ramy3: "#397f11",
+			zaznaczony1: "#ff6107",
+			zaznaczony2: "#ff6107",
+			zaznaczony3: "#ff6107",
+			siatka: "#1b3900",
+		},
+		zmien:function(nr)
+		{
+			if (!funkcjeMotywow.motywy[nr]){return}
+			localStorage.setItem("motyw",nr)
+			location.reload()
+		},
+		nadaj:function()
+		{
+			const nr=Number(localStorage.getItem("motyw"))||0
+			if (!funkcjeMotywow.motywy[nr]){console.log(`błąd motywów kolorystycznych: ${nr}`);return}
+			funkcjeMotywow.wybrany=JSON.parse(JSON.stringify(funkcjeMotywow.motywy[nr]))
+			funkcjeMotywow.nr=nr
+			for (k in funkcjeMotywow.wybrany)
+			{
+				if (k=="nazwa"){continue}
+				document.documentElement.style.setProperty(`--${k}`,funkcjeMotywow.wybrany[k]||"#7f39b1")
+			}
 		}
-		ekran.mapa.canvas.wyglad.odswiezaj=1
-		ekran.mapa.canvas.szczegoly.odswiezaj=1
-		ekran.uklad.canvas.obraz_1.odswiezaj=1
-		ekran.mapa.interaktywne.planety.odswiezaj=1
 	}
 	class Ekran
 	{
-		constructor(nazwa,canvas,interaktywne)
+		constructor(nr)
 		{
-			this.nazwa=nazwa
 			this.div=document.createElement("div")
 	    	this.div.className="ekran"
-	    	this.div.id=`ekran-${nazwa}`
+	    	this.div.id=`ekran_${nr}`
 	    	//
-	    	this.stan=0
 	    	this.zmiana=0
-	    	this.aktywny=1
+	    	this.stan=0
 	    	//
-	    	this.canvas={}
-	    	for (let nazwa of canvas)
-	    	{
-	    		this.nowyCanvas(nazwa)
-	    	}
-	    	this.interaktywne={}
-	    	for (let nazwa of (interaktywne||[]))
-	    	{
-	    		this.noweInteraktywne(nazwa)
-	    	}
-			this.dotyk={elementy:[],div:document.createElement("div")}
-			this.dotyk.div.className="ekranWypelnienie"
+	    	this.elementyDotykowe=[]
+			this.dotyk=document.createElement("div")
+			this.dotyk.className="ekranWypelnienie"
+			//
+			this.kontent=document.createElement("div")
+			this.kontent.className="ekranWypelnienie"
 			//
 			this.narozniki=[]
 	    	for (let i=0 ; i<4 ; i++)
@@ -91,47 +123,17 @@
 	    		naroznik.strony.push(`${["Top","Bottom"][Math.floor(i/2)]}`)
 	    		for (const strona of naroznik.strony)
 	    		{
-	    			naroznik.div.style[`border${strona}`]=`solid 0.5vh var(--podstawowy1)`
+	    			naroznik.div.style[`border${strona}`]=`solid 0.5vh var(--ramy1)`
 	    		}
 	    		this.narozniki.push(naroznik)
 	    		this.div.appendChild(naroznik.div)
 	    	}
-	    	for (let nazwa in this.canvas)
-			{
-				this.div.appendChild(this.canvas[nazwa].canvas)
-			}
-			for (let nazwa in this.interaktywne)
-			{
-				this.div.appendChild(this.interaktywne[nazwa].div)
-			}
-	    	this.div.appendChild(this.dotyk.div)
-	    	//
+	    	this.div.appendChild(this.kontent)
+	    	this.div.appendChild(this.dotyk)
+	    	this.dotyk.addEventListener("mousemove",(e)=>{this.mysz(e,this)})
+	    	this.dotyk.addEventListener("click",(e)=>{this.mysz(e,this,"klik")})
+	    	document.getElementById("kontent").appendChild(this.div)
 	    	this.nadajStan(0)
-	    	this.petla()
-		}
-		nowyCanvas(nazwa)
-		{
-			const canvas={}
-			canvas.canvas=document.createElement("canvas")
-			canvas.canvas.className="ekranWypelnienie"
-			canvas.canvas.style.opacity=0
-			canvas.obraz=0
-			canvas.gotowe=0
-			canvas.pokazane=0
-			canvas.odswiezaj=0
-			this.canvas[nazwa]=canvas
-		}
-		noweInteraktywne(nazwa)
-		{
-			const e={}
-			e.div=document.createElement("div")
-			e.div.className="ekranWypelnienie"
-			e.div.style.opacity=0
-			e.obraz=0
-			e.gotowe=0
-			e.pokazane=0
-			e.odswiezaj=0
-			this.interaktywne[nazwa]=e
 		}
 		nadajStan(stan)
 		{
@@ -139,59 +141,27 @@
 			if (stan!=0 && stan!=1){console.log("błąd");return}
 			this.stan=stan
 			this.zmiana=1
-			this.dotyk.div.innerHTML=""
-			//
-			if (stan){this.nadanieWypelnienia()}
-			else
+			this.dotyk.innerHTML=""
+			if (stan)
 			{
-				for (let nazwa in this.canvas)
+				for (let e of this.elementyDotykowe)
 				{
-					if (this.canvas[nazwa].odswiezaj)
+					if (!e.div)
 					{
-						this.canvas[nazwa].obraz=0
-						this.canvas[nazwa].gotowe=0
-						this.canvas[nazwa].pokazane=0
+						e.div=document.createElement("div")
+						e.div.className="zaznacznik"
 					}
-				}
-				for (let nazwa in this.interaktywne)
-				{
-					if (this.interaktywne[nazwa].odswiezaj)
-					{
-						this.interaktywne[nazwa].obraz=0
-						this.interaktywne[nazwa].gotowe=0
-						this.interaktywne[nazwa].pokazane=0
-					}
+					e.div.style.position="absolute"
+					e.div.style.top=`${(e.y||50)-((e.h||14)/2)}%`
+	    			e.div.style.left=`${(e.x||50)-((e.d||14)/2)}%`
+	    			e.div.style.height=`${(e.h||14)}%`
+	    			e.div.style.width=`${(e.d||14)}%`
+	    			this.dotyk.appendChild(e.div)
 				}
 			}
-			setTimeout(()=>{this.krycieWypelnienia(stan)},[1,310][stan])
+			setTimeout(()=>{this.kontent.style.opacity=stan},[1,310][stan])
 			setTimeout(()=>{this.stanNaroznikow(stan)},[50,1][stan])
 			setTimeout(()=>{this.zmiana=0},350)
-		}
-		krycieWypelnienia(stan)
-		{
-			for (let nazwa in this.canvas)
-			{
-				if (stan && this.canvas[nazwa].gotowe)
-				{
-					this.canvas[nazwa].canvas.style.opacity=1
-				}
-				else
-				{
-					this.canvas[nazwa].canvas.style.opacity=0
-				}
-			}
-			for (let nazwa in this.interaktywne)
-			{
-				if (stan && this.interaktywne[nazwa].gotowe)
-				{
-					this.interaktywne[nazwa].div.style.opacity=1
-				}
-				else
-				{
-					this.interaktywne[nazwa].div.style.opacity=0
-				}
-			}
-			this.dotyk.div.style.opacity=stan
 		}
 		stanNaroznikow(stan)
 		{
@@ -203,461 +173,457 @@
 	    		}
 	    	}
 		}
-		nadanieWypelnienia()
+		mysz(e,kontekst,klik)
 		{
-			this.dotyk.div.innerHTML=""
-			setTimeout(()=>{this.aktywny=1},700)
-			for (let i=0 ; i<(this.dotyk.elementy||[]).length ; i++)
+			const obszar = kontekst.dotyk.getBoundingClientRect()
+			let mX = Math.round(((e.clientX-obszar.left)/obszar.width)*10000)/100
+    		let mY = Math.round(((e.clientY-obszar.top)/obszar.height)*10000)/100
+    		if (klik && typeof kontekst.reakcja=="function")
 			{
-				const zaznacznik=document.createElement("div")
-	    		zaznacznik.className="zaznacznik"
-	    		zaznacznik.style.top=`${this.dotyk.elementy[i].y}%`
-	    		zaznacznik.style.left=`${this.dotyk.elementy[i].x}%`
-	    		zaznacznik.onclick = new Function(`ekran.${this.nazwa}.uruchom(${i})`)
-				this.dotyk.div.appendChild(zaznacznik)
+				kontekst.reakcja(mY,mX)
 			}
-		}
-		uruchom(nr)
-		{
-			if (!this.aktywny){return}
-			this.aktywny=0
-			if (typeof this.dotyk.elementy[nr].funkcja=="string")
+    		const lista=[]
+			for (let e of kontekst.elementyDotykowe)
 			{
-				new Function(this.dotyk.elementy[nr].funkcja)()
+				if (!e.div){continue}
+				e.div.style.opacity=0
+				if (mY<e.y-e.r){continue}
+				if (mY>e.y+e.r){continue}
+				if (mX<e.x-e.r){continue}
+				if (mX>e.x+e.r){continue}
+				const odl=Math.pow(Math.pow(mY-e.y,2)+Math.pow(mX-e.x,2),0.5)
+				if (odl>e.r){continue}
+				lista.push([e,odl])
 			}
-			else if (typeof this.dotyk.elementy[nr].funkcja=="function")
-	    	{
-	    		this.dotyk.elementy[nr].funkcja()
-	    	}
-	    	else
-	    	{
-	    		console.log("nieznany typ funkcji")
-	    	}
-		}
-		pokaz(nazwa)
-		{
-			if (this.canvas[nazwa].obraz)
+			if (lista.length>0)
 			{
-				setTimeout(()=>
+				if (lista.length==1)
 				{
-					rysuj(this.canvas[nazwa].canvas,this.canvas[nazwa].obraz)
-					setTimeout(()=>{this.canvas[nazwa].gotowe=1},50)
-				},100)
-			}
-		}
-		petla()
-		{
-			if (this.stan==1 && this.zmiana==0)
-			{
-				for (let nazwa in this.canvas)
-				{
-					if (this.canvas[nazwa].gotowe && !this.canvas[nazwa].pokazane)
+					lista[0][0].div.style.opacity=1
+					if (klik)
 					{
-						this.canvas[nazwa].canvas.style.transition="0.3s"
-						this.aktywny=0
-						this.canvas[nazwa].pokazane=1
-						setTimeout(()=>{this.canvas[nazwa].canvas.style.opacity=1},1)
-						setTimeout(()=>{this.aktywny=1;this.canvas[nazwa].canvas.style.transition="none"},300)
+						kontekst.uruchom(lista[0][0])
+					}
+					return
+				}
+				else
+				{
+					const min=[-1,obszar.width*2]
+					for (let i=0 ; i<lista.length ; i++)
+					{
+						if (lista[i][1]<min[1])
+						{
+							min[0]=i
+							min[1]=lista[i][1]
+						}
+					}
+					if (min[0]>-1)
+					{
+						lista[min[0]][0].div.style.opacity=1
+						if (klik)
+						{
+							kontekst.uruchom(lista[min[0]][0])
+						}
 					}
 				}
 			}
-			setTimeout(()=>{this.petla()},700)
+		}
+		uruchom(e)
+		{
+			if (!this.stan){return}
+			if (this.zmiana){return}
+			if (e && typeof e==="object")
+			{
+				if (typeof e.funkcja==="function")
+				{
+					e.funkcja()
+				}
+				else if (typeof e.funkcja==="string")
+				{
+					new Function(e.funkcja)()
+				}
+			}
 		}
 	}
 	const ekran=
-	{
-		mapa: new Ekran("mapa",["tlo","wyglad","szczegoly"],["planety"]),
-		uklad: new Ekran("uklad",["tlo","obraz_1"]),
-	}
+	[
+		{
+			aktywnyWidok:Number(localStorage.getItem("widok_ekran0"))||0,
+			dane:0,
+			zmien:function(nr)
+			{
+				if (nr===undefined)
+				{
+					nr=Math.abs(ekran[0].aktywnyWidok-1)
+				}
+				if (ekran[0].aktywnyWidok===nr){return}
+				ekran[0].ekran.nadajStan(0)
+				ekran[0].aktywnyWidok=nr
+				ekran[0].dane=0
+				localStorage.setItem("widok_ekran0",`${ekran[0].aktywnyWidok}`)
+				setTimeout(()=>{ekran[0].ekran.kontent.innerHTML=""},300)
+				setTimeout(()=>{ekran[0].widoki[nr].start()},370)
+			},
+			widoki:
+			[
+				{
+					start:function()
+					{
+						ekran[0].ekran.elementyDotykowe.push({y:20,x:80,r:30})
+						ekran[0].ekran.elementyDotykowe.push({y:27,x:72,r:30})
+						ekran[0].ekran.nadajStan(1)
+					},
+					odswiez:function()
+					{
+						ekran[0].ekran.nadajStan(0)
+						setTimeout(()=>{ekran[0].ekran.nadajStan(1)},370)
+					}
+				},
+				{
+					start:function()
+					{
+						ekran[0].dane={korekta:[0,0],uklady:[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]}
+						const canvas=document.createElement("canvas")
+						canvas.style.width="100%"
+						canvas.style.height="100%"
+						const elementy=[]
+						elementy[0]={kolor:"black",punkty:[[100,100],[100,600],[600,600],[600,100]],krycie:0.9,rozmycie:50}
+						for (let b=1 ; b<18 ; b++)
+						{
+							elementy.push({kolorLini:funkcjeMotywow.wybrany.siatka,grubosc:1,punkty:[[20,b*20],[20,700-(b*20)],[680,700-(b*20)],[680,b*20]]})
+						}
+						for (let b=1 ; b<18 ; b++)
+						{
+							elementy.push({kolorLini:funkcjeMotywow.wybrany.siatka,grubosc:1,punkty:[[b*20,20],[700-(b*20),20],[700-(b*20),680],[b*20,680]]})
+						}
+						rysuj(canvas,{h:700,d:700,elementy:elementy})
+						ekran[0].ekran.kontent.appendChild(canvas)
+						//
+						const gwiazdy=document.createElement("canvas")
+						gwiazdy.id="gwiazdy"
+						ekran[0].ekran.kontent.appendChild(gwiazdy)
+						const planety=document.createElement("div")
+						planety.id="planety"
+						ekran[0].ekran.kontent.appendChild(planety)
+						const znaczniki=document.createElement("div")
+						znaczniki.id="znaczniki"
+						ekran[0].ekran.kontent.appendChild(znaczniki)
+						const szczegoly=document.createElement("canvas")
+						szczegoly.id="szczegoly"
+						ekran[0].ekran.kontent.appendChild(szczegoly)
+						setTimeout(()=>{ekran[0].widoki[1].odswiez()},100)
+					},
+					odswiez:function()
+					{
+						if (ekran[0].ekran.stan)
+						{
+							ekran[0].ekran.nadajStan(0)
+						}
+						setTimeout(()=>{document.getElementById("planety").innerHTML=""},300)
+						ekran[0].ekran.elementyDotykowe=[]
+						//
+						ekran[0].dane.korekta=[0,0]
+						for (let y=0 ; y<5 ; y++)
+						{
+							for (let x=0 ; x<5  ; x++)
+							{
+								ekran[0].dane.uklady[y][x]=odczytajUklad((polozenie[0]-2)+y,(polozenie[1]-2)+x)
+								if (ekran[0].dane.uklady[y][x] && y==2 && x==2)
+								{
+									for (let i=0 ; i<2 ; i++)
+									{
+										ekran[0].dane.korekta[i]=Math.round((0.5-ekran[0].dane.uklady[y][x].procent[i])*100)/100
+										if (ekran[0].dane.korekta[i]>0.15)
+										{
+											ekran[0].dane.korekta[i]=0.15
+										}
+										else if (ekran[0].dane.korekta[i]<-0.15)
+										{
+											ekran[0].dane.korekta[i]=-0.15
+										}
+									}
+								}
+							}
+						}
+						const elementy=[]
+						for (let y=0 ; y<5 ; y++)
+						{
+							for (let x=0 ; x<5  ; x++)
+							{
+								if (ekran[0].dane.uklady[y][x])
+								{
+									const uklad=ekran[0].dane.uklady[y][x]
+									for (let i=0 ; i<2 ; i++)
+									{
+										let procent=[y,x][i]*20
+										procent+=uklad.procent[i]*20
+										procent+=ekran[0].dane.korekta[i]*20
+										uklad.procent[i]=procent
+									}
+									uklad.srodek=[(uklad.procent[0]/100)*700,(uklad.procent[1]/100)*700]
+									//dodawanie gwiazdy:
+									elementy.push({kolor:`hsl(${60-Math.floor(Math.pow(12-uklad.kolor,3)/28.8)},${100}%,${77}%)`,srodek:uklad.srodek,promien:uklad.wielkosc+7,rozmycie:(uklad.wielkosc+7)*1.4})
+									elementy.push({kolor:`hsl(${60-Math.floor(Math.pow(12-uklad.kolor,3)/28.8)},${100}%,${35+Math.floor(Math.pow(uklad.kolor+1,2)/2.4)}%)`,srodek:uklad.srodek,promien:uklad.wielkosc+2})
+									//dodawanie planet:
+									const boxPlanet=document.createElement("div")
+									boxPlanet.style.position="absolute"
+									boxPlanet.style.width="12%"
+									boxPlanet.style.height="12%"
+									boxPlanet.style.top=`${-6+uklad.procent[0]}%`
+									boxPlanet.style.left=`${-6+uklad.procent[1]}%`
+									for (let i=0 ; i<uklad.iloscPlanet ; i++)
+									{
+										const planeta=document.createElement("canvas")
+										const czas=Math.round((Math.pow(Math.pow((uklad.wielkosc+2)+(i*3.5)+2,3),0.5))*1000)//w milisekundach
+										planeta.style.animation=`rotate ${czas/1000}s linear infinite`
+										const orbita=(uklad.wielkosc+2)+(i*4)+5
+										const etap=((Date.now()%czas)/czas)*2
+										let kat=uklad.planety[i].kat-etap
+										if (kat<0){kat+=2}
+										const elementy=[]
+										elementy.push({kolorLini:"#393939",grubosc:1,srodek:[40,40],promien:orbita,zakresKatow:[kat,kat+(0.7/((i+2)*0.77))]})
+										elementy.push({kolor:"#757575",srodek:[40+Math.sin(kat*Math.PI)*orbita,40+Math.cos(kat*Math.PI)*orbita],promien:1.5})
+										rysuj(planeta,{h:80,d:80,elementy:elementy})
+										boxPlanet.appendChild(planeta)
+									}
+									setTimeout(()=>{document.getElementById("planety").appendChild(boxPlanet)},300)
+									//dodawanie przycisków
+									ekran[0].ekran.elementyDotykowe.push({y:uklad.procent[0],x:uklad.procent[1],r:12,funkcja:`zaznaczUklad(${(polozenie[0]-2)+y},${(polozenie[1]-2)+x})`})
+								}
+							}
+						}
+						for (let a=0 ; a<3 ; a++)
+						{
+							for (let b=0 ; b<3 ; b++)
+							{
+								if (!ekran[0].dane.uklady[[0,2,4][a]][[0,2,4][b]])
+								{
+									ekran[0].ekran.elementyDotykowe.push({y:[7,50,93][a],x:[7,50,93][b],r:12,funkcja:`zaznaczUklad(${(polozenie[0]-2)+[0,2,4][a]},${(polozenie[1]-2)+[0,2,4][b]})`})
+								}
+							}
+						}
+						setTimeout(()=>{rysuj(document.getElementById("gwiazdy"),{h:700,d:700,elementy:elementy})},300)
+						setTimeout(()=>{ekran[0].ekran.nadajStan(1)},370)
+						//
+						setTimeout(()=>{document.getElementById("szczegoly").style.transition="0s"},297)
+						setTimeout(()=>{document.getElementById("szczegoly").style.opacity=0},298)
+						setTimeout(()=>{rysuj(document.getElementById("szczegoly"),{h:700,d:700,elementy:[]})},299)
+						const lista=[]
+						for (let y=0 ; y<5 ; y++)
+						{
+							for (let x=0 ; x<5  ; x++)
+							{
+								if (ekran[0].dane.uklady[y][x])
+								{
+									lista.push({adres:[(polozenie[0]-2)+y,(polozenie[1]-2)+x],polozenie:[y,x]})
+								}
+							}
+						}
+						znaczniki.szczegoly=`${polozenie[0]}${polozenie[1]}${Math.floor(Math.random()*100)}`
+						//funkcja uruchamiana po pobraniu układów oblicza czas jaki minął od wysłania zapytania i uruchamia funkcję rysowania w taki sposób, żeby minęło minimum 1500 milisekund (czas zamykania ekranu i czas na zobaczenie układów bez szczegółów)
+						//znacznik służy do tego żeby odrzucić rysowanie jeżeli gracz zdążył przesunąć się na mapie
+						pobierzSzczegolyUkladow(lista).then(new Function(`d`,`setTimeout(()=>{if(znaczniki.szczegoly==="${znaczniki.szczegoly}"){ekran[0].widoki[1].pokazSzczegoly(d)}},Math.max(1,1500-(Date.now()-${Date.now()})))`))
+					},
+					pokazSzczegoly:function(dane)
+					{
+						const elementy=[]
+						for (let szczegoly of dane)
+						{
+							const procent=ekran[0].dane.uklady[szczegoly.polozenie[0]][szczegoly.polozenie[1]].procent
+							const cy=(procent[0]/100)*700
+							const cx=(procent[1]/100)*700
+							console.log(szczegoly)
+							if (!szczegoly.odkryty)
+							{
+								elementy.push({kolor:"black",srodek:[cy,cx],promien:38,krycie:0.4,rozmycie:10})
+								continue
+							}
+							if (szczegoly.sos>0)
+							{
+								elementy.push({kolor:"black",srodek:[cy-22,cx+22],promien:12})
+								elementy.push({kolorLini:["black","#007fbb","#396100","#610075","#b18900","#934d00","#b10000","#f7392f"][szczegoly.sos]||"#e31b61",grubosc:2,srodek:[cy-22,cx+22],promien:12})
+								elementy.push({kolor:"#b1b1b1",punkty:[[cy-31,cx+19],[cy-31,cx+25],[cy-21,cx+22]]})
+								elementy.push({kolor:"#b1b1b1",srodek:[cy-14,cx+22],promien:2})
+							}
+							else if (szczegoly.obecnosc)
+							{
+								elementy.push({kolor:"#397f11",punkty:[[cy-25,cx+19],[cy-25,cx+25],[cy-17,cx+22]]})
+							}
+							if (szczegoly.gildia)
+							{
+								const kolor=["red","green","blue"][Math.floor(Math.random()*3)]
+								const punkty=[[cy+17,cx+18],[cy+18,cx+20],[cy+18,cx+24],[cy+17,cx+26],[cy+22,cx+27],[cy+28,cx+22],[cy+22,cx+17]]
+								elementy.push({kolor:kolor,krycie:0.1,punkty:punkty})
+								elementy.push({kolorLini:kolor,grubosc:1,punkty:punkty})
+							}
+						}
+						rysuj(document.getElementById("szczegoly"),{h:700,d:700,elementy:elementy})
+						setTimeout(()=>{document.getElementById("szczegoly").style.transition="0.2s"},1)
+						setTimeout(()=>{document.getElementById("szczegoly").style.opacity=1},2)
+						setTimeout(()=>{document.getElementById("szczegoly").style.transition="0s"},250)
+					}
+				}
+			]
+		},
+		{
+			aktywnyWidok:Number(localStorage.getItem("widok_ekran1"))||0,
+			dane:0,
+			zmien:function(nr)
+			{
+				if (nr===undefined)
+				{
+					nr=Math.abs(ekran[1].aktywnyWidok-1)
+				}
+				if (ekran[1].aktywnyWidok===nr){return}
+				ekran[1].ekran.nadajStan(0)
+				ekran[1].aktywnyWidok=nr
+				ekran[1].dane=0
+				localStorage.setItem("widok_ekran1",`${ekran[1].aktywnyWidok}`)
+				setTimeout(()=>{ekran[1].ekran.kontent.innerHTML=""},300)
+				setTimeout(()=>{ekran[1].widoki[nr].start()},370)
+			},
+			widoki:
+			[
+				{
+					start:function()
+					{
+						const canvas=document.createElement("canvas")
+						canvas.style.width="100%"
+						canvas.style.height="100%"
+						const elementy=[]
+						elementy[0]={kolor:"black",punkty:[[100,100],[100,600],[600,600],[600,100]],krycie:0.9,rozmycie:50}
+						elementy[1]={kolorLini:funkcjeMotywow.wybrany.ramy1,punkty:[[300,320],[300,300],[320,300],[400,380],[400,400],[380,400]],grubosc:3}
+						elementy[2]={kolorLini:funkcjeMotywow.wybrany.ramy1,punkty:[[380,300],[400,300],[400,320],[320,400],[300,400],[300,380]],grubosc:3}
+						elementy[3]={kolor:"black",punkty:[[302,302],[302,398],[398,398],[398,302]]}
+						rysuj(canvas,{h:700,d:700,elementy:elementy})
+						ekran[1].ekran.kontent.appendChild(canvas)
+						//
+						const uklady=document.createElement("canvas")
+						uklady.id="uklady"
+						ekran[1].ekran.kontent.appendChild(uklady)
+						setTimeout(()=>{ekran[1].widoki[0].odswiez()},100)
+						//
+						ekran[1].ekran.reakcja=function(y,x)
+						{
+							if (!ekran[1].ekran.stan){return}
+							if (ekran[1].ekran.zmiana){return}
+							if ((Math.abs(y-50)<8) && (Math.abs(x-50)<8))
+							{
+								if (ekran[0].aktywnyWidok!=0)
+								{
+									ekran[0].zmien()
+								}
+								return
+							}
+							const yy=(polozenie[0]-17)+Math.round(((y/100)*35)-0.5)
+							const xx=(polozenie[1]-17)+Math.round(((x/100)*35)-0.5)
+							zaznaczUklad(yy,xx)
+						}
+					},
+					odswiez:function()
+					{
+						if (ekran[1].ekran.stan)
+						{
+							ekran[1].ekran.nadajStan(0)
+						}
+						setTimeout(()=>{document.getElementById("uklady").innerHTML=""},300)
+						ekran[1].ekran.elementyDotykowe=[]
+						//
+						const elementy=[]
+						for (let y=0 ; y<35 ; y++)
+						{
+							for (let x=0 ; x<35  ; x++)
+							{
+								const uklad=odczytajUklad((polozenie[0]-17)+y,(polozenie[1]-17)+x)
+								if (uklad)
+								{
+									const kolor=((uklad.wielkosc*10)+uklad.iloscPlanet)*4
+									const srodek=[(y*20)+(uklad.procent[0]*20),(x*20)+(uklad.procent[1]*20)]
+									elementy.push({kolor:`rgba(${kolor+67},${kolor+57},${kolor})`,srodek:srodek,promien:(uklad.wielkosc/4)+1.5})
+								}
+							}
+						}
+						setTimeout(()=>{rysuj(document.getElementById("uklady"),{h:700,d:700,elementy:elementy})},300)
+						setTimeout(()=>{ekran[1].ekran.nadajStan(1)},370)
+					}
+				},
+				{
+					start:function()
+					{
+						ekran[1].ekran.nadajStan(1)
+					},
+					odswiez:function()
+					{
+						//
+					}
+				}
+			]
+		}
+	]
+	const znaczniki={}
+	const polozenie=JSON.parse(localStorage.getItem("polozenie")||"0")||[350,350]
+	const historiaPolozenia=JSON.parse(localStorage.getItem("historiaPolozenia")||"0")||{czas:0,historia:[]}
 	function zaznaczUklad(y,x)
 	{
-		if (!(y>-1 && y<700 && x>-1 && x<700))
+		if (!(y>-1 && y<700 && x>-1 && x<700)){return}
+		if (y==polozenie[0] && x==polozenie[1])
 		{
-			setTimeout(()=>{ekran.mapa.aktywny=1},100)
+			console.log("pokazanie układu")
+			if (ekran[1].aktywnyWidok!=1)
+			{
+				setTimeout(ekran[1].zmien,170)
+			}
 			return
 		}
-		polozenie.unshift([y,x])
-		polozenie=polozenie.slice(0,57)
-		uzupelnianieDanych.wygladUkladow(y-19,y+19,x-19,x+19)
-		setTimeout(()=>
+		znaczniki.polozenie=`${y}${x}${Math.floor(Math.random()*100)}`
+		setTimeout(new Function(`if(znaczniki.polozenie==="${znaczniki.polozenie}"){localStorage.setItem("polozenie","[${y},${x}]")}`),4000)
+		if (historiaPolozenia.czas)
 		{
-			ekran.mapa.nadajStan(0)
-			ekran.uklad.nadajStan(0)
-			pokaz.mape()
-			pokaz.minimape()
-			if (!menu.guziki[1][0].aktywny)
+			//jeżeli gracz długo ogląda układ zapisuje się w histori żeby mógł do niego łatwo wrócić
+			if (Date.now()-historia.czas>5500)
 			{
-				menu.guziki[1][0].odswiez({aktywny:1,funkcja:"cofnij()",zaznaczony:0})
-			}
-		},150)
-	}
-	function cofnij()
-	{
-		if (polozenie.length<3)
-		{
-			menu.guziki[1][0].odswiez({aktywny:0,funkcja:"",zaznaczony:0})
-		}
-		if (polozenie.length<2){debugger;return}
-		polozenie=polozenie.slice(1)
-		const y=polozenie[0][0]
-		const x=polozenie[0][1]
-		uzupelnianieDanych.wygladUkladow(y-19,y+19,x-19,x+19)
-		ekran.mapa.nadajStan(0)
-		ekran.uklad.nadajStan(0)
-		pokaz.mape()
-		pokaz.minimape()
-	}
-	pokaz=
-	{
-		mape:function(proba)
-		{
-			proba=proba||1
-			if (proba>27){console.log("ładowanie mapy nie powiodło się");return}
-			const lista=uzupelnianieDanych.wygladUkladow(polozenie[0][0]-2,polozenie[0][0]+2,polozenie[0][1]-2,polozenie[0][1]+2,77)
-			if (!Array.isArray(lista)){return setTimeout(()=>{pokaz.mape(proba+1)},300)}
-			//
-			ekran.mapa.dotyk.elementy=[]
-			ekran.mapa.ukladCentralny=0
-			ekran.mapa.ukladCentralny=uzupelnianieDanych.wygladUkladow(polozenie[0][0],polozenie[0][0]+1,polozenie[0][1],polozenie[0][1]+1,77)[0]
-			//
-			ekran.mapa.pola=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
-			const korekta=[0,0]
-			for (let uklad of lista)
-			{
-				//układanie ukłądó z listy na planszę 2D
-				if (uklad.wielkosc<1 || uklad.przesuniecie<1){continue}
-				const wzgledneY=(uklad.y-polozenie[0][0])+2
-				const wzgledneX=(uklad.x-polozenie[0][1])+2
-				if (!(wzgledneY>=0 && wzgledneY<5 && wzgledneX>=0 && wzgledneX<5))
-				{
-					console.log(`błąd: ${wzgledneY} - ${wzgledneY}`)
-					continue
-				}
-				//
-				const procent=realnePolozenieUkladu(uklad.y,uklad.x,uklad.przesuniecie)
-				ekran.mapa.pola[wzgledneY][wzgledneX]={procent:procent,uklad:uklad}
-				//
-				if (wzgledneX===2 && wzgledneY===2)
-				{
-					for (let i=0 ; i<2 ; i++)
-					{
-						korekta[i]=Math.round((0.5-procent[i])*100)/100
-						if (korekta[i]>0.15)
-						{
-							korekta[i]=0.15
-						}
-						else if (korekta[i]<-0.15)
-						{
-							korekta[i]=-0.15
-						}
-					}
-				}
-			}
-			if (!(!korekta[0] && !korekta[1]))
-			{
-				//przesuwanie ukłądów zgodnie z korektą
-				for (let y=0 ; y<5 ; y++)
-				{
-					for (let x=0 ; x<5 ; x++)
-					{
-						const pole=ekran.mapa.pola[y][x]
-						if (pole)
-						{
-							pole.procent[0]+=korekta[0]
-							pole.procent[1]+=korekta[1]
-							if (y==2 && x==2)
-							{
-								ekran.mapa.ukladCentralny.procent=pole.procent
-							}
-						}
-					}
-				}
-			}
-			const elementy=[]
-			for (let y=0 ; y<5 ; y++)
-			{
-				for (let x=0 ; x<5 ; x++)
-				{
-					const pole=ekran.mapa.pola[y][x]
-					const f=`zaznaczUklad(${polozenie[0][0]-2+y},${polozenie[0][1]-2+x})`
-					if (pole)
-					{
-						pole.srodek=[Math.round((140*y+140*pole.procent[0])*100)/100,Math.round((140*x+140*pole.procent[1])*100)/100]
-						elementy.push({kolor:`hsl(${60-Math.floor(Math.pow(12-pole.uklad.kolor,3)/28.8)},${100}%,${77}%)`,srodek:pole.srodek,promien:pole.uklad.wielkosc+7,rozmycie:14})
-						elementy.push({kolor:`hsl(${60-Math.floor(Math.pow(12-pole.uklad.kolor,3)/28.8)},${100}%,${35+Math.floor(Math.pow(pole.uklad.kolor+1,2)/2.4)}%)`,srodek:pole.srodek,promien:pole.uklad.wielkosc+2})
-						ekran.mapa.dotyk.elementy.push({y:y*20+((pole.procent[0])*20),x:x*20+((pole.procent[1])*20),funkcja:f})
-						if (pole.uklad.iloscPlanet<1){debugger}
-						if (y!=2 || x!=2)
-						{
-							for (let i=0 ; i<pole.uklad.iloscPlanet ; i++)
-							{
-								//dodawanie planet
-								const promien=(pole.uklad.wielkosc+2)+(i*4)+5
-								const zakresKatow=[]
-								zakresKatow[0]=Math.random()*2
-								zakresKatow[1]=zakresKatow[0]+(Math.random()*0.25)+(1.7/((i+1)*3))
-								if (zakresKatow[1]>2){zakresKatow[1]-=2}
-								elementy.push({kolorLini:"#4d4d4d",grubosc:1,srodek:pole.srodek,promien:promien,zakresKatow:zakresKatow})
-								elementy.push({kolor:"#616161",srodek:[pole.srodek[0]+Math.sin(zakresKatow[0]*Math.PI)*promien,pole.srodek[1]+Math.cos(zakresKatow[0]*Math.PI)*promien],promien:1.5})
-							}
-						}
-					}
-					else if (((y===0 || y===4) && (x===0 || x===2 || x===4)) || ((x===0 || x===4) && (y===0 || y===2 || y===4)))
-					{
-						//dodanie pola do kliknięcia na krańcach mapy żeby dało się zmieniać położenie widoku nawet gdy nie ma układu
-						ekran.mapa.dotyk.elementy.push({y:y*20+10,x:x*20+10,funkcja:f})
-					}
-				}
-			}
-			//
-			ekran.mapa.interaktywne.planety.div.innerHTML=""
-			if (ekran.mapa.ukladCentralny)
-			{
-				for (let i=0 ; i<ekran.mapa.ukladCentralny.iloscPlanet ; i++)
-				{
-					const pole=ekran.mapa.ukladCentralny
-					const canvas=document.createElement("canvas")
-					canvas.style.position="absolute"
-					canvas.style.width="16%"
-					canvas.style.height=canvas.style.width
-					canvas.style.top=`${32+(20*pole.procent[0])}%`
-					canvas.style.left=`${32+(20*pole.procent[1])}%`
-					canvas.style.animation=`rotate ${Math.round((Math.pow(Math.pow((pole.wielkosc+2)+(i*3.5)+5.5,3),0.5))*100)/100}s linear infinite`
-					ekran.mapa.interaktywne.planety.div.appendChild(canvas)
-					const elementy=[]
-					const srodek=[41,41]
-					const promien=(pole.wielkosc+2)+(i*4)+5
-					const zakresKatow=[]
-					zakresKatow[0]=Math.random()*2
-					zakresKatow[1]=zakresKatow[0]+(Math.random()*0.25)+(1.7/((i+1)*3))
-					if (zakresKatow[1]>2){zakresKatow[1]-=2}
-					elementy.push({kolorLini:"#4d4d4d",grubosc:1,srodek:srodek,promien:promien,zakresKatow:zakresKatow})
-					elementy.push({kolor:"#616161",srodek:[srodek[0]+Math.sin(zakresKatow[0]*Math.PI)*promien,srodek[1]+Math.cos(zakresKatow[0]*Math.PI)*promien],promien:1.5})
-					rysuj(canvas,{h:81,d:81,elementy:elementy})
-				}
-				ekran.mapa.interaktywne.planety.gotowe=1
-			}
-			//
-			elementy.push({kolorLini:"black",grubosc:14,punkty:[[0,0],[0,700],[700,700],[700,0]],rozmycie:5})
-			ekran.mapa.canvas.wyglad.obraz={h:700,d:700,elementy:elementy}
-			ekran.mapa.pokaz("wyglad")
-			//
-			setTimeout(()=>{ekran.mapa.nadajStan(1)},370)
-			setTimeout(()=>{pokaz.szczegoly()},1050)
-		},
-		minimape:function(proba)
-		{
-			proba=proba||1
-			if (proba>20){console.log("ładowanie mapy nie powiodło się");return}
-			const lista=uzupelnianieDanych.wygladUkladow(polozenie[0][0]-17,polozenie[0][0]+17,polozenie[0][1]-17,polozenie[0][1]+17,77)
-			if (!Array.isArray(lista)){return setTimeout(()=>{pokaz.minimape(proba+1)},400)}
-			//
-			ekran.uklad.dotyk.elementy=[]
-			const elementy=[]
-			for (let uklad of lista)
-			{
-				if (uklad.wielkosc<1 || uklad.przesuniecie<1){continue}
-				const wzgledneY=(uklad.y-polozenie[0][0])+17
-				const wzgledneX=(uklad.x-polozenie[0][1])+17
-				if (!(wzgledneY>=0 && wzgledneY<35 && wzgledneX>=0 && wzgledneX<35))
-				{
-					console.log(`błąd: ${wzgledneY} - ${wzgledneY}`)
-					continue
-				}
-				const procent=realnePolozenieUkladu(uklad.y,uklad.x,uklad.przesuniecie)
-				const kolor=((uklad.wielkosc*10)+uklad.iloscPlanet)*4
-				elementy.push({kolor:`rgba(${kolor+67},${kolor+57},${kolor})`,srodek:[20*wzgledneY+20*procent[0],20*wzgledneX+20*procent[1]],promien:(uklad.wielkosc/4)+1.5})
-			}
-			ekran.uklad.canvas.obraz_1.obraz={h:700,d:700,elementy:elementy}
-			ekran.uklad.pokaz("obraz_1")
-			//
-			setTimeout(()=>{ekran.uklad.nadajStan(1)},370)
-		},
-		szczegoly:function(proba)
-		{
-			// czy odkryta, czy ktoś obecny, sos, listaUslug
-
-			const elementy=[]
-			for (let y=0 ; y<5 ; y++)
-			{
-				for (let x=0 ; x<5 ; x++)
-				{
-					const pole=ekran.mapa.pola[y][x]
-					if (!pole){continue}
-					const cy=pole.srodek[0]
-					const cx=pole.srodek[1]
-					const szczegoly=pamiec.szukaj.szczegolyUkladow()
-					if (!szczegoly){continue}
-					if (!szczegoly.odkryty)
-					{
-						elementy.push({kolor:"black",srodek:pole.srodek,promien:38,krycie:0.4,rozmycie:10})
-						continue
-					}
-					if (szczegoly.sos>0)
-					{
-						elementy.push({kolor:"black",srodek:[cy-22,cx+22],promien:12})
-						elementy.push({kolorLini:["black","#007fbb","#396100","#610075","#b18900","#934d00","#b10000","#f7392f"][szczegoly.sos]||"#e31b61",grubosc:2,srodek:[cy-22,cx+22],promien:12})
-						elementy.push({kolor:"#b1b1b1",punkty:[[cy-31,cx+19],[cy-31,cx+25],[cy-21,cx+22]]})
-						elementy.push({kolor:"#b1b1b1",srodek:[cy-14,cx+22],promien:2})
-					}
-					else if (szczegoly.obecnosc)
-					{
-						elementy.push({kolor:"#397f11",punkty:[[cy-25,cx+19],[cy-25,cx+25],[cy-17,cx+22]]})
-					}
-					if (szczegoly.gildia)
-					{
-						const kolor=pamiec.pamiec.gildie[szczegoly.gildia].kolor
-						const punkty=[[cy+17,cx+18],[cy+18,cx+20],[cy+18,cx+24],[cy+17,cx+26],[cy+22,cx+27],[cy+28,cx+22],[cy+22,cx+17]]
-						elementy.push({kolor:kolor,krycie:0.1,punkty:punkty})
-						elementy.push({kolorLini:kolor,grubosc:1,punkty:punkty})
-					}
-				}
-			}
-			ekran.mapa.canvas.szczegoly.obraz={d:700,h:700,elementy:elementy}
-			ekran.mapa.pokaz("szczegoly")
-		}
-	}
-	uzupelnianieDanych=
-	{
-		wygladUkladow:function(Ystart,Ykoniec,Xstart,Xkoniec,proba)
-		{
-			if (!(Ykoniec-Ystart>0 && Ykoniec-Ystart<51)){console.log("błąd");console.log(Ystart,Ykoniec,Xstart,Xkoniec);return}
-			if (!(Xkoniec-Xstart>0 && Xkoniec-Xstart<51)){console.log("błąd");console.log(Ystart,Ykoniec,Xstart,Xkoniec);return}
-			proba=proba||1
-			const obecne=[]
-			const nieobecne=[]
-			for (let y=Ystart ; y<Ykoniec+1 ; y++)
-			{
-				for (let x=Xstart ; x<Xkoniec+1 ; x++)
-				{
-					const uklad=pamiec.szukaj.wygladUkladow(y,x)
-					if (uklad)
-					{
-						uklad.y=y
-						uklad.x=x
-						obecne.push(uklad)
-					}
-					else
-					{
-						nieobecne.push([y,x])
-					}
-				}
-			}
-			if (nieobecne.length>0)
-			{
-				if (proba<4)
-				{
-					serwer.pytaj.wygladUkladow(nieobecne)
-					setTimeout(()=>{uzupelnianieDanych.wygladUkladow(Ystart,Ykoniec,Xstart,Xkoniec,proba+1)},5000)
-				}
-				return 0
-			}
-			return obecne
-		},
-		szczegolyUkladow:function(lista)
-		{
-			//
-		}
-	}
-	serwer=
-	{
-		pytaj:
-		{
-			wygladUkladow:function(lista)
-			{
-				let zwrotka=""
-				for (uklad of lista)
-				{
-					//funkcja testowa, losuje ukłądy i zwraca jak serwer
-					let s=koduj.adres(uklad[0],uklad[1],0,1)
-					if (Math.random()<0.05 || Math.random()<(punkt(uklad[0],uklad[1])/40))
-					{
-						if (!(uklad[0]>-1 && uklad[0]<700 && uklad[1]>-1 && uklad[1]<700))
-						{
-							//kiedy pytanie o ukłąd poza planszą zwraca brak
-							s+=koduj.wygladUkladu(1,0,0,0)
-						}
-						else
-						{
-							s+=koduj.wygladUkladu(los(1,4),los(1,9),los(0,11),los(1,7))
-						}
-					}
-					else
-					{
-						s+=koduj.wygladUkladu(1,0,0,0)
-					}
-					zwrotka+=s
-				}
-				setTimeout(()=>{serwer.odbierz.wygladUkladow(zwrotka)},200+Math.random()*300)
-			}
-		},
-		odbierz:
-		{
-			wygladUkladow:function(lista)
-			{
-				console.log(`serwer wysłał ${lista.length/6} układów`)
-				for (let i=0 ; i<lista.length ; i+=6)
-				{
-					let s=""
-					for (let j=0 ; j<6 ; j++)
-					{
-						s+=lista[i+j]
-					}
-					pamiec.dodaj.wygladUkladow(s)
-				}
+				historiaPolozenia.historia.unshift([polozenie[0],polozenie[1]])
+				historiaPolozenia.historia=unshift(0,57)
+				historia.czas=Date.now()
+				localStorage.setItem("historiaPolozenia",JSON.stringify(historiaPolozenia))
 			}
 		}
+		polozenie[0]=y
+		polozenie[1]=x
+		if (ekran[0].aktywnyWidok!=1)
+		{
+			setTimeout(ekran[0].zmien,170)
+		}
+		else
+		{
+			setTimeout(ekran[0].widoki[ekran[0].aktywnyWidok].odswiez,170)
+		}
+		if (ekran[1].aktywnyWidok!=0)
+		{
+			setTimeout(ekran[1].zmien,170)
+		}
+		else
+		{
+			setTimeout(ekran[1].widoki[ekran[1].aktywnyWidok].odswiez,170)
+		}
 	}
-	pamiec=
+	function odczytajUklad(y,x)
 	{
-		pamiec:
+		if ((y<0 || y>699) || (x<0 || x>699)){return 0}
+		const nr=((y*700)+x)*2
+		const kod=wygladUkladow.slice(nr,nr+2)
+		const uklad=odkoduj.wygladUkladu(kod)
+		if (uklad.przesuniecie==0){return 0}
+		uklad.procent=realnePolozenieUkladu(y,x,uklad.przesuniecie)
+		uklad.planety=[]
+		for (let i=0 ; i<uklad.iloscPlanet ; i++)
 		{
-			wygladUkladow:[[],[],[],[],[],[],[],[],[]],
-			gildie:[{nazwa:"wolni",kolor:"black"},{nazwa:"Pax",kolor:"#1b93ed"},{nazwa:"Saguarianie",kolor:"#ffc54d"},{nazwa:"kurczeraz",kolor:"#e34d25"}]
-		},
-		adres:
-		{
-			wygladUkladow(y,x)
-			{
-				if (y<0 || x<0){debugger}
-				const nrListy=(Math.floor((y%150)/50)*3)+Math.floor((x%150)/50)
-				const pozycja=((y%50)*50)+(x%50)
-				return {nrListy:nrListy,pozycja:pozycja}
-			}
-		},
-		dodaj:
-		{
-			wygladUkladow:function(s)
-			{
-				const adres=odkoduj.adres(s.slice(0,4))
-				const {nrListy,pozycja}=pamiec.adres.wygladUkladow(adres.y,adres.x)
-				pamiec.pamiec.wygladUkladow[nrListy][pozycja]={y:adres.y,x:adres.x,u:s.slice(4,6)}
-			}
-		},
-		szukaj:
-		{
-			wygladUkladow:function(y,x)
-			{
-				if (!(y>=0 && x>=0 && x<700 && y<700))
-				{
-					return {y:y,x:x,wielkosc:1,przesuniecie:0,kolor:0,iloscPlanet:0}
-				}
-				const {nrListy,pozycja}=pamiec.adres.wygladUkladow(y,x)
-				let uklad=pamiec.pamiec.wygladUkladow[nrListy][pozycja]
-				if (!uklad || typeof uklad!="object"){return 0}
-				if (!(uklad.y==y && uklad.x==x)){return 0}
-				uklad=odkoduj.wygladUkladu(uklad.u)
-				uklad.y=y
-				uklad.x=x
-				return uklad
-			},
-			szczegolyUkladow:function(y,x)
-			{
-				let sos=0
-				if (Math.random()<0.1){sos=los(1,7)}
-				return {odkryty:los(0,1),obecnosc:los(0,1),gildia:los(0,3),sos:sos,uslugi:[]}
-			}
-		},
+			const planeta={}
+			planeta.kat=[[[1.2,0.4,0.8,1,1.6,0.2,1.4],[0.6,0.4,1.6,1.4,1.8,0.8,1.2],[1.6,0.8,0.2,1.4,0,1,1.2],[1,1.6,0.4,0,0.6,0.8,1.8],[1.6,0.6,1.2,0,0.2,0.4,1],[1.4,1,1.2,0.8,0.2,1.8,0],[1.8,0,1.2,0.4,1.4,0.8,1.6]],[[1,0.8,0,0.2,1.4,0.4,1.2],[1,1.8,1.2,0,0.2,1.4,0.8],[0.6,0.2,1,1.6,1.4,1.2,1.8],[1,0.8,0.2,1.8,0,0.4,1.4],[1.8,0.6,1.4,1,0.4,1.6,0],[0.8,0.6,1.4,1.2,0.4,0,0.2],[1,0.2,0.4,1.6,1.4,1.8,0.8]],[[1.2,1.8,1.4,0,1,0.2,0.4],[1.4,1.6,1.8,0.6,0.8,0.2,1.2],[1.8,0.6,1.4,0.4,0.2,0.8,1],[0.4,1.8,0.8,0,1,1.2,0.6],[0,1,0.8,1.6,1.4,0.6,1.8],[0.2,0.6,0.8,1.8,1.6,0.4,0],[0.4,0.2,1.6,1.4,0.6,1.8,0]],[[1.4,1.8,1.2,0.6,0.8,0.2,0.4],[1.8,0.6,1.2,0.4,1,1.4,0.8],[0.4,0.2,1.2,1,1.4,1.8,0.6],[0.2,1.6,0,0.6,1.8,0.4,0.8],[0.8,1.4,0,1.6,1.8,1,0.2],[1.8,1.4,0,1.6,1,1.2,0.8],[0,0.8,0.4,1.4,1.6,1.2,0.2]]][((y%2)*2)+x%2][uklad.iloscPlanet-1][i]
+			//planeta.kat=(((i*9)+((y%3)*3)+x%3)%12)*0.17
+			uklad.planety.push(planeta)
+		}
+		return uklad
 	}
 	function realnePolozenieUkladu(y,x,przesuniecie)
 	{
@@ -677,52 +643,25 @@
 		// wartość zwrotki jest procentowa i oznacza przesunięcie w polu od lewego górnego narożnika
 		return zwrotka
 	}
+	async function pobierzSzczegolyUkladow(lista)
+	{
+		const zwrotka=[]
+		for (let pozycja of lista)
+		{
+			//w domyśle serwer będzie zwracał kodowane dane a ta funkcja przekształci je w obiekty
+			//adres to położenie bezwzględne a położenie to położenie na ekranie
+			//adres i położenie jest dodawane do danych pobranych z serwera bo jest istotne w etapie wyświetlania
+			let sos=0
+			if (Math.random()<0.1){sos=los(1,7)}
+			zwrotka.push({adres:pozycja.adres,polozenie:pozycja.polozenie,odkryty:los(0,1),obecnosc:los(0,1),gildia:los(0,3),sos:sos,uslugi:[]})
+		}
+		return zwrotka
+	}
 	function los(min,max)
 	{
 		let l=Math.random()*((max-min)+1)
 		l+=min
 		return Math.floor(l)
-	}
-	function punkt(y,x)
-	{
-		const mocSkrecenia=15
-		const szerokoscRamienia=1.57
-		const gasniecie=0.027
-		//
-		const odl_1=odleglosc([y,x],[350,350])
-		let zacienienie=0
-		for (let r=0 ; r<2 ; r++)
-		{
-			const kat=0.7+(r*Math.PI)+(mocSkrecenia/((odl_1/7)+1))
-			const punktRamienia=[Math.sin(kat)*odl_1+350,Math.cos(kat)*odl_1+350]
-			let sz=((szerokoscRamienia*(odl_1))+0.1)
-			const odl_2=odleglosc(punktRamienia,[y,x])
-			if (odl_2<sz)
-			{
-				let gestosc=(odl_2/sz)*5
-				if (gestosc<1)
-				{
-					gestosc=Math.pow(gestosc,2)
-				}
-				else
-				{
-					gestosc=(4-(Math.pow((5-gestosc),2)/4))+1
-				}
-				gestosc=(5-gestosc)/5
-				zacienienie=Math.max(zacienienie,gestosc)
-			}
-		}
-		zacienienie*=60
-		zacienienie=zacienienie/(Math.pow(Math.max(odl_1-10,0)*gasniecie,1.1)+1)//wyciemnienie brzegów
-		zacienienie+=Math.pow(1/((odl_1/70)+1),3)*20//rozjaśnienie środka
-		zacienienie+=(10/((odl_1*gasniecie)+1))//rozmycie liniowe
-		return Math.floor(zacienienie)
-		function odleglosc(p1,p2)
-		{
-			y=Math.pow(p1[0]-p2[0],2)
-			x=Math.pow(p1[1]-p2[1],2)
-			return Math.pow(y+x,0.5)
-		}
 	}
 </script>
 </head>
