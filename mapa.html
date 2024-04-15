@@ -415,7 +415,7 @@
 										const elementy=[]
 										elementy.push({kolorLini:"#393939",grubosc:1,srodek:[40,40],promien:orbita,zakresKatow:[kat,kat+(0.7/((i+2)*0.77))]})
 										elementy.push({kolor:"#757575",srodek:[40+Math.sin(kat*Math.PI)*orbita,40+Math.cos(kat*Math.PI)*orbita],promien:1.5})
-										if (i<2 || y==2 && x==2)
+										if ((y==2 && x==2) || i==0 || (i<2 && ((x!=0 &&x!=4) || (y!=0 &&y!=4))))
 										{
 											//z powodu optymalizacji osobno kręcić będą się tylko dwie pierwsze planety i wszystkie zaznaczonego układu
 											const planeta=document.createElement("canvas")
