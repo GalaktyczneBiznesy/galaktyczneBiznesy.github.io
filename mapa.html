@@ -3,7 +3,7 @@
 <head>
 <title>Galaktyczne Biznesy</title>
 <meta charset="utf-8" />
-<link rel="stylesheet" href="globalne.css">
+<link rel="stylesheet" href="style.css">
 <script src="funkcjeTla.js"></script>
 <script src="funkcjeMenu.js"></script>
 <script src="funkcjeKodowania.js"></script>
@@ -269,12 +269,34 @@
 				{
 					start:function()
 					{
-						ekran[0].ekran.elementyDotykowe.push({y:20,x:80,r:30})
-						ekran[0].ekran.elementyDotykowe.push({y:27,x:72,r:30})
-						ekran[0].ekran.nadajStan(1)
+						ekran[0].dane=0
+						const src=["https://i1.jbzd.com.pl/comments/2024/04/original/L6zfeb6ZVIpBhjEODwVOM9UgNkFeHnKZ.png","https://i1.jbzd.com.pl/comments/2024/04/original/9DpIwN4NnqdtRo3g19NLMBxnDsIQntHQ.png","https://i1.jbzd.com.pl/comments/2024/04/original/gWxiVjFWskQgcR3LjjXcZMKlI7wVf9rj.png","https://i1.jbzd.com.pl/comments/2024/04/original/3SEdZ0KtmeT0zOJJiKw6tVCc0z6vtLsF.png","https://i1.jbzd.com.pl/comments/2024/04/original/7zT97Qm8xFLaPZMDisehaEEakFEJ7uuK.png"]
+						for (let i=0 ; i<src.length ; i++)
+						{
+							const obrazek=document.createElement("img")
+							obrazek.src=src[i]
+							obrazek.style.position="absolute"
+							obrazek.style.width="100%"
+							obrazek.style.height="100%"
+							ekran[0].ekran.kontent.appendChild(obrazek)
+						}
+						ekran[0].ekran.reakcja=function(y,x)
+						{
+							if (!ekran[1].ekran.stan){return}
+							if (ekran[1].ekran.zmiana){return}
+							const yy=Math.round(((y/100)*700)-0.5)
+							const xx=Math.round(((x/100)*700)-0.5)
+							zaznaczUklad(yy,xx)
+						}
+						setTimeout(()=>{ekran[0].widoki[0].odswiez()},100)
 					},
 					odswiez:function()
 					{
+						if (ekran[0].ekran.stan)
+						{
+							ekran[0].ekran.nadajStan(0)
+						}
+						ekran[0].ekran.elementyDotykowe=[]
 						ekran[0].ekran.nadajStan(0)
 						setTimeout(()=>{ekran[0].ekran.nadajStan(1)},370)
 					}
@@ -284,6 +306,7 @@
 					{
 						ekran[0].dane={korekta:[0,0],uklady:[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]}
 						const canvas=document.createElement("canvas")
+						canvas.style.position="absolute"
 						canvas.style.width="100%"
 						canvas.style.height="100%"
 						const elementy=[]
@@ -301,17 +324,33 @@
 						//
 						const gwiazdy=document.createElement("canvas")
 						gwiazdy.id="gwiazdy"
+						gwiazdy.style.position="absolute"
+						gwiazdy.style.width="100%"
+						gwiazdy.style.height="100%"
 						ekran[0].ekran.kontent.appendChild(gwiazdy)
 						const planety=document.createElement("div")
 						planety.id="planety"
+						planety.style.position="absolute"
+						planety.style.width="100%"
+						planety.style.height="100%"
 						ekran[0].ekran.kontent.appendChild(planety)
 						const znaczniki=document.createElement("div")
 						znaczniki.id="znaczniki"
+						znaczniki.style.position="absolute"
+						znaczniki.style.width="100%"
+						znaczniki.style.height="100%"
 						ekran[0].ekran.kontent.appendChild(znaczniki)
 						const szczegoly=document.createElement("canvas")
 						szczegoly.id="szczegoly"
+						szczegoly.style.position="absolute"
+						szczegoly.style.width="100%"
+						szczegoly.style.height="100%"
 						ekran[0].ekran.kontent.appendChild(szczegoly)
 						setTimeout(()=>{ekran[0].widoki[1].odswiez()},100)
+						ekran[0].ekran.reakcja=function(y,x)
+						{
+							return
+						}
 					},
 					odswiez:function()
 					{
@@ -365,17 +404,10 @@
 									elementy.push({kolor:`hsl(${60-Math.floor(Math.pow(12-uklad.kolor,3)/28.8)},${100}%,${77}%)`,srodek:uklad.srodek,promien:uklad.wielkosc+7,rozmycie:(uklad.wielkosc+7)*1.4})
 									elementy.push({kolor:`hsl(${60-Math.floor(Math.pow(12-uklad.kolor,3)/28.8)},${100}%,${35+Math.floor(Math.pow(uklad.kolor+1,2)/2.4)}%)`,srodek:uklad.srodek,promien:uklad.wielkosc+2})
 									//dodawanie planet:
-									const boxPlanet=document.createElement("div")
-									boxPlanet.style.position="absolute"
-									boxPlanet.style.width="12%"
-									boxPlanet.style.height="12%"
-									boxPlanet.style.top=`${-6+uklad.procent[0]}%`
-									boxPlanet.style.left=`${-6+uklad.procent[1]}%`
+									const zlepek={elementy:[],czas:[]}
 									for (let i=0 ; i<uklad.iloscPlanet ; i++)
 									{
-										const planeta=document.createElement("canvas")
 										const czas=Math.round((Math.pow(Math.pow((uklad.wielkosc+2)+(i*3.5)+2,3),0.5))*1000)//w milisekundach
-										planeta.style.animation=`rotate ${czas/1000}s linear infinite`
 										const orbita=(uklad.wielkosc+2)+(i*4)+5
 										const etap=((Date.now()%czas)/czas)*2
 										let kat=uklad.planety[i].kat-etap
@@ -383,10 +415,45 @@
 										const elementy=[]
 										elementy.push({kolorLini:"#393939",grubosc:1,srodek:[40,40],promien:orbita,zakresKatow:[kat,kat+(0.7/((i+2)*0.77))]})
 										elementy.push({kolor:"#757575",srodek:[40+Math.sin(kat*Math.PI)*orbita,40+Math.cos(kat*Math.PI)*orbita],promien:1.5})
-										rysuj(planeta,{h:80,d:80,elementy:elementy})
-										boxPlanet.appendChild(planeta)
+										if (i<2 || y==2 && x==2)
+										{
+											//z powodu optymalizacji osobno kręcić będą się tylko dwie pierwsze planety i wszystkie zaznaczonego układu
+											const planeta=document.createElement("canvas")
+											planeta.style.animation=`rotate ${Math.round(czas/100)/10}s linear infinite`
+											planeta.style.position="absolute"
+											planeta.style.width="12%"
+											planeta.style.height="12%"
+											planeta.style.top=`${-6+uklad.procent[0]}%`
+											planeta.style.left=`${-6+uklad.procent[1]}%`
+											rysuj(planeta,{h:80,d:80,elementy:elementy})
+											setTimeout(()=>{document.getElementById("planety").appendChild(planeta)},300)
+										}
+										else
+										{
+											zlepek.czas.push(czas)
+											for (let j=0 ; j<elementy.length ; j++)
+											{
+												zlepek.elementy.push(elementy[j])
+											}
+										}
 									}
-									setTimeout(()=>{document.getElementById("planety").appendChild(boxPlanet)},300)
+									if (zlepek.czas.length>0)
+									{
+										let c=0
+										for (let i=0 ; i<zlepek.czas.length ; i++)
+										{
+											c+=zlepek.czas[i]
+										}
+										const planeta=document.createElement("canvas")
+										planeta.style.position="absolute"
+										planeta.style.width="12%"
+										planeta.style.height="12%"
+										planeta.style.top=`${-6+uklad.procent[0]}%`
+										planeta.style.left=`${-6+uklad.procent[1]}%`
+										planeta.style.animation=`rotate ${Math.round((c/zlepek.czas.length)/100)/10}s linear infinite`
+										rysuj(planeta,{h:80,d:80,elementy:zlepek.elementy})
+										setTimeout(()=>{document.getElementById("planety").appendChild(planeta)},300)
+									}
 									//dodawanie przycisków
 									ekran[0].ekran.elementyDotykowe.push({y:uklad.procent[0],x:uklad.procent[1],r:12,funkcja:`zaznaczUklad(${(polozenie[0]-2)+y},${(polozenie[1]-2)+x})`})
 								}
@@ -452,7 +519,7 @@
 							if (szczegoly.gildia)
 							{
 								const kolor=["red","green","blue"][Math.floor(Math.random()*3)]
-								const punkty=[[cy+17,cx+18],[cy+18,cx+20],[cy+18,cx+24],[cy+17,cx+26],[cy+22,cx+27],[cy+28,cx+22],[cy+22,cx+17]]
+								const punkty=[[cy+17,cx+18],[cy+16,cx+20],[cy+16,cx+24],[cy+17,cx+26],[cy+22,cx+27],[cy+28,cx+22],[cy+22,cx+17]]
 								elementy.push({kolor:kolor,krycie:0.1,punkty:punkty})
 								elementy.push({kolorLini:kolor,grubosc:1,punkty:punkty})
 							}
@@ -488,10 +555,11 @@
 					start:function()
 					{
 						const canvas=document.createElement("canvas")
+						canvas.style.position="absolute"
 						canvas.style.width="100%"
 						canvas.style.height="100%"
 						const elementy=[]
-						elementy[0]={kolor:"black",punkty:[[100,100],[100,600],[600,600],[600,100]],krycie:0.9,rozmycie:50}
+						elementy[0]={kolor:"black",punkty:[[50,50],[50,650],[650,650],[650,50]],krycie:0.95,rozmycie:25}
 						elementy[1]={kolorLini:funkcjeMotywow.wybrany.ramy1,punkty:[[300,320],[300,300],[320,300],[400,380],[400,400],[380,400]],grubosc:3}
 						elementy[2]={kolorLini:funkcjeMotywow.wybrany.ramy1,punkty:[[380,300],[400,300],[400,320],[320,400],[300,400],[300,380]],grubosc:3}
 						elementy[3]={kolor:"black",punkty:[[302,302],[302,398],[398,398],[398,302]]}
@@ -500,6 +568,9 @@
 						//
 						const uklady=document.createElement("canvas")
 						uklady.id="uklady"
+						uklady.style.position="absolute"
+						uklady.style.width="100%"
+						uklady.style.height="100%"
 						ekran[1].ekran.kontent.appendChild(uklady)
 						setTimeout(()=>{ekran[1].widoki[0].odswiez()},100)
 						//
@@ -551,6 +622,10 @@
 					start:function()
 					{
 						ekran[1].ekran.nadajStan(1)
+						ekran[1].ekran.reakcja=function(y,x)
+						{
+							return
+						}
 					},
 					odswiez:function()
 					{
