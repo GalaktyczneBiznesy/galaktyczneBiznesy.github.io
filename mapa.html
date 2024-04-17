@@ -22,7 +22,7 @@
 		//
 		setTimeout(()=>{menu.guziki[0][2].odswiez({aktywny:1,menu:'test',zaznaczony:1})},4000)
 		setTimeout(()=>{menu.guziki[1][0].odswiez({aktywny:1,funkcja:"let nr=funkcjeMotywow.nr+1;if(nr>funkcjeMotywow.motywy.length-1){nr=0}funkcjeMotywow.zmien(nr)",zaznaczony:0})},4000)
-		setTimeout(()=>{menu.guziki[0][1].odswiez({aktywny:1,funkcja:'alert("i co mnie klikasz tutej zaraz Ciebie kliknę")',zaznaczony:0})},4000)
+		setTimeout(()=>{menu.guziki[0][1].odswiez({aktywny:1,funkcja:'alert("i co mnie klikasz tutej zaraz Ciebie kliknę. (test)")',zaznaczony:0})},4000)
 		setTimeout(()=>
 		{
 			ekran[0].widoki[ekran[0].aktywnyWidok].start()
@@ -404,6 +404,7 @@
 									elementy.push({kolor:`hsl(${60-Math.floor(Math.pow(12-uklad.kolor,3)/28.8)},${100}%,${77}%)`,srodek:uklad.srodek,promien:uklad.wielkosc+7,rozmycie:(uklad.wielkosc+7)*1.4})
 									elementy.push({kolor:`hsl(${60-Math.floor(Math.pow(12-uklad.kolor,3)/28.8)},${100}%,${35+Math.floor(Math.pow(uklad.kolor+1,2)/2.4)}%)`,srodek:uklad.srodek,promien:uklad.wielkosc+2})
 									//dodawanie planet:
+									/*kod wyłączony do testów
 									const zlepek={elementy:[],czas:[]}
 									for (let i=0 ; i<uklad.iloscPlanet ; i++)
 									{
@@ -454,16 +455,18 @@
 										rysuj(planeta,{h:80,d:80,elementy:zlepek.elementy})
 										setTimeout(()=>{document.getElementById("planety").appendChild(planeta)},300)
 									}
+									*/
 									//dodawanie przycisków
 									ekran[0].ekran.elementyDotykowe.push({y:uklad.procent[0],x:uklad.procent[1],r:12,funkcja:`zaznaczUklad(${(polozenie[0]-2)+y},${(polozenie[1]-2)+x})`})
 								}
 							}
 						}
+						setTimeout(()=>{ekran[0].widoki[1].rysujPlanety()},900)
 						for (let a=0 ; a<3 ; a++)
 						{
 							for (let b=0 ; b<3 ; b++)
 							{
-								if (!ekran[0].dane.uklady[[0,2,4][a]][[0,2,4][b]])
+								if ((a!=1 || b!=1) && !ekran[0].dane.uklady[[0,2,4][a]][[0,2,4][b]])
 								{
 									ekran[0].ekran.elementyDotykowe.push({y:[7,50,93][a],x:[7,50,93][b],r:12,funkcja:`zaznaczUklad(${(polozenie[0]-2)+[0,2,4][a]},${(polozenie[1]-2)+[0,2,4][b]})`})
 								}
@@ -527,6 +530,41 @@
 						setTimeout(()=>{document.getElementById("szczegoly").style.transition="0.2s"},1)
 						setTimeout(()=>{document.getElementById("szczegoly").style.opacity=1},2)
 						setTimeout(()=>{document.getElementById("szczegoly").style.transition="0s"},250)
+					},
+					rysujPlanety:function()
+					{
+						if (!ekran[0].ekran.stan){return}
+						if (ekran[0].ekran.zmiana){return}
+						const planety=document.getElementById("planety")
+						if (!planety){return}
+						planety.innerHTML=""
+						const elementy=[]
+						const canvas=document.createElement("canvas")
+						canvas.style.position="absolute"
+						canvas.style.width="100%"
+						canvas.style.height="100%"
+						document.getElementById("planety").appendChild(canvas)
+						for (let y=0 ; y<5 ; y++)
+						{
+							for (let x=0 ; x<5  ; x++)
+							{
+								const uklad=ekran[0].dane.uklady[y][x]
+								if (!uklad){continue}
+								uklad.srodek=[(uklad.procent[0]/100)*700,(uklad.procent[1]/100)*700]
+								for (let i=0 ; i<uklad.iloscPlanet ; i++)
+								{
+									const czas=Math.round((Math.pow(Math.pow((uklad.wielkosc+2)+(i*3.5)+2,3),0.5))*1000)//w milisekundach
+									const orbita=(uklad.wielkosc+2)+(i*4)+5
+									const etap=((Date.now()%czas)/czas)*2
+									let kat=uklad.planety[i].kat-etap
+									if (kat<0){kat+=2}
+									elementy.push({kolorLini:"#393939",grubosc:1,srodek:uklad.srodek,promien:orbita,zakresKatow:[kat,kat+(0.7/((i+2)*0.77))]})
+									elementy.push({kolor:"#757575",srodek:[uklad.srodek[0]+Math.sin(kat*Math.PI)*orbita,uklad.srodek[1]+Math.cos(kat*Math.PI)*orbita],promien:1.5})
+								}
+							}
+						}
+						rysuj(canvas,{h:700,d:700,elementy:elementy})
+						setTimeout(()=>{ekran[0].widoki[1].rysujPlanety()},100)
 					}
 				}
 			]
