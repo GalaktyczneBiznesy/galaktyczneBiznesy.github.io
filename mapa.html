@@ -292,20 +292,16 @@
 							if (ekran[1].ekran.zmiana){return}
 							const yy=Math.round(((y/100)*700)-0.5)
 							const xx=Math.round(((x/100)*700)-0.5)
-							const elementy=[]
-							const p=[yy,xx]
-							elementy[0]={kolorLini:funkcjeMotywow.wybrany.ramy1,grubosc:3,punkty:[[p[0]-25,p[1]-25],[p[0]+25,p[1]-25],[p[0]+25,p[1]+25],[p[0]-25,p[1]+25]]}
-							elementy[1]={kolorLini:funkcjeMotywow.wybrany.ramy1,grubosc:1,punkty:[[p[0]-3,p[1]-3],[p[0]+3,p[1]-3],[p[0]+3,p[1]+3],[p[0]-3,p[1]+3]]}
-							setTimeout(()=>{rysuj(document.getElementById("polozenie"),{d:700,h:700,elementy:elementy})},1)
-							setTimeout(()=>{zaznaczUklad(yy,xx)},1000)
+							zaznaczUklad(yy,xx)
 						}
 						setTimeout(()=>{ekran[0].widoki[0].odswiez()},100)
 					},
 					odswiez:function()
 					{
-						if (ekran[0].ekran.stan)
+						if (ekran[0].ekran.zmiana){return}
+						if (!ekran[0].ekran.stan)
 						{
-							ekran[0].ekran.nadajStan(0)
+							setTimeout(()=>{ekran[0].ekran.nadajStan(1)},370)
 						}
 						ekran[0].ekran.elementyDotykowe=[]
 						const p=[polozenie[0],polozenie[1]]
@@ -313,7 +309,8 @@
 						elementy[0]={kolorLini:funkcjeMotywow.wybrany.ramy1,grubosc:3,punkty:[[p[0]-25,p[1]-25],[p[0]+25,p[1]-25],[p[0]+25,p[1]+25],[p[0]-25,p[1]+25]]}
 						elementy[1]={kolorLini:funkcjeMotywow.wybrany.ramy1,grubosc:1,punkty:[[p[0]-3,p[1]-3],[p[0]+3,p[1]-3],[p[0]+3,p[1]+3],[p[0]-3,p[1]+3]]}
 						setTimeout(()=>{rysuj(document.getElementById("polozenie"),{d:700,h:700,elementy:elementy})},300)
-						setTimeout(()=>{ekran[0].ekran.nadajStan(1)},370)
+						znaczniki.przemieszczenie1=`${polozenie[0]}${polozenie[1]}${Math.floor(Math.random()*100)}`
+						setTimeout(new Function(`if(znaczniki.przemieszczenie1==="${znaczniki.przemieszczenie1}"){ekran[0].zmien(1)}`),5000)
 					}
 				},
 				{
@@ -654,7 +651,13 @@
 				{
 					start:function()
 					{
-						ekran[1].ekran.nadajStan(1)
+						const uklad=document.createElement("canvas")
+						uklad.id="uklad"
+						uklad.style.position="absolute"
+						uklad.style.width="100%"
+						uklad.style.height="100%"
+						ekran[1].ekran.kontent.appendChild(uklad)
+						setTimeout(()=>{ekran[1].widoki[1].odswiez()},100)
 						ekran[1].ekran.reakcja=function(y,x)
 						{
 							return
@@ -662,7 +665,30 @@
 					},
 					odswiez:function()
 					{
-						//
+						if (ekran[1].ekran.stan)
+						{
+							ekran[1].ekran.nadajStan(0)
+						}
+						const uklad=document.getElementById("uklad")
+						const elementy=[]
+						const zaznaczonyUklad=odczytajUklad(polozenie[0],polozenie[1])
+						elementy[0]={kolor:`hsl(${60-Math.floor(Math.pow(12-zaznaczonyUklad.kolor,3)/28.8)},${100}%,${77}%)`,srodek:[100,100],promien:(zaznaczonyUklad.wielkosc+5)*5,rozmycie:(zaznaczonyUklad.wielkosc+7)*7}
+						elementy[1]={kolor:`hsl(${60-Math.floor(Math.pow(12-zaznaczonyUklad.kolor,3)/28.8)},${100}%,${35+Math.floor(Math.pow(zaznaczonyUklad.kolor+1,2)/2.4)}%)`,srodek:[100,100],promien:(zaznaczonyUklad.wielkosc+2)*5}
+						const sloty=[0,0,0,0,0,0,0]
+						let r=(zaznaczonyUklad.wielkosc+2)*5
+						for (let i=0 ; i<zaznaczonyUklad.planety.length ; i++)
+						{
+							//minimalna odległośc między planetami to 80 a maksymalna to 107
+							r+=(80+(Math.random()*27))
+							const y=(i*80)+180
+							const x=r*Math.cos(Math.asin(Math.abs(y-100)/r))+100;
+							elementy.push({kolorLini:`#111111`,grubosc:7,srodek:[100,100],promien:r,rozmycie:3})
+							const kolor=Math.floor(Math.random()*61)
+							elementy.push({kolor:`hsl(${kolor},100%,57%)`,srodek:[y-1,x-1],promien:8.5})
+							elementy.push({kolor:`hsl(${kolor},70%,7%)`,srodek:[y,x],promien:9})
+						}
+						setTimeout(()=>{rysuj(uklad,{d:700,h:700,elementy:elementy})},270)
+						setTimeout(()=>{ekran[1].ekran.nadajStan(1)},370)
 					}
 				}
 			]
@@ -702,14 +728,7 @@
 		starePolozenie[1]=polozenie[1]
 		polozenie[0]=y
 		polozenie[1]=x
-		if (ekran[0].aktywnyWidok!=1)
-		{
-			setTimeout(ekran[0].zmien,170)
-		}
-		else
-		{
-			setTimeout(ekran[0].widoki[ekran[0].aktywnyWidok].odswiez,170)
-		}
+		setTimeout(ekran[0].widoki[ekran[0].aktywnyWidok].odswiez,170)
 		if (ekran[1].aktywnyWidok!=0)
 		{
 			setTimeout(ekran[1].zmien,170)
