@@ -270,7 +270,7 @@
 					start:function()
 					{
 						ekran[0].dane=0
-						const src=["https://i1.jbzd.com.pl/comments/2024/04/original/L6zfeb6ZVIpBhjEODwVOM9UgNkFeHnKZ.png","https://i1.jbzd.com.pl/comments/2024/04/original/9DpIwN4NnqdtRo3g19NLMBxnDsIQntHQ.png","https://i1.jbzd.com.pl/comments/2024/04/original/gWxiVjFWskQgcR3LjjXcZMKlI7wVf9rj.png","https://i1.jbzd.com.pl/comments/2024/04/original/3SEdZ0KtmeT0zOJJiKw6tVCc0z6vtLsF.png","https://i1.jbzd.com.pl/comments/2024/04/original/7zT97Qm8xFLaPZMDisehaEEakFEJ7uuK.png"]
+						const src=["https://i1.jbzd.com.pl/comments/2024/04/original/7zT97Qm8xFLaPZMDisehaEEakFEJ7uuK.png"]
 						for (let i=0 ; i<src.length ; i++)
 						{
 							const obrazek=document.createElement("img")
@@ -672,20 +672,26 @@
 						const uklad=document.getElementById("uklad")
 						const elementy=[]
 						const zaznaczonyUklad=odczytajUklad(polozenie[0],polozenie[1])
-						elementy[0]={kolor:`hsl(${60-Math.floor(Math.pow(12-zaznaczonyUklad.kolor,3)/28.8)},${100}%,${77}%)`,srodek:[100,100],promien:(zaznaczonyUklad.wielkosc+5)*5,rozmycie:(zaznaczonyUklad.wielkosc+7)*7}
-						elementy[1]={kolor:`hsl(${60-Math.floor(Math.pow(12-zaznaczonyUklad.kolor,3)/28.8)},${100}%,${35+Math.floor(Math.pow(zaznaczonyUklad.kolor+1,2)/2.4)}%)`,srodek:[100,100],promien:(zaznaczonyUklad.wielkosc+2)*5}
+						elementy[0]={kolor:`black`,punkty:[[25,25],[25,675],[675,675],[675,25]],rozmycie:14,krycie:0.9}
+						elementy[1]={kolor:`hsl(${60-Math.floor(Math.pow(12-zaznaczonyUklad.kolor,3)/28.8)},${100}%,${77}%)`,srodek:[100,100],promien:(zaznaczonyUklad.wielkosc+5)*5,rozmycie:(zaznaczonyUklad.wielkosc+7)*7}
+						elementy[2]={kolor:`hsl(${60-Math.floor(Math.pow(12-zaznaczonyUklad.kolor,3)/28.8)},${100}%,${35+Math.floor(Math.pow(zaznaczonyUklad.kolor+1,2)/2.4)}%)`,srodek:[100,100],promien:(zaznaczonyUklad.wielkosc+2)*5,rozmycie:1}
 						const sloty=[0,0,0,0,0,0,0]
 						let r=(zaznaczonyUklad.wielkosc+2)*5
 						for (let i=0 ; i<zaznaczonyUklad.planety.length ; i++)
 						{
+							const planeta=zaznaczonyUklad.planety[i]
 							//minimalna odległośc między planetami to 80 a maksymalna to 107
-							r+=(80+(Math.random()*27))
+							r+=planeta.dystans
 							const y=(i*80)+180
 							const x=r*Math.cos(Math.asin(Math.abs(y-100)/r))+100;
-							elementy.push({kolorLini:`#111111`,grubosc:7,srodek:[100,100],promien:r,rozmycie:3})
-							const kolor=Math.floor(Math.random()*61)
-							elementy.push({kolor:`hsl(${kolor},100%,57%)`,srodek:[y-1,x-1],promien:8.5})
-							elementy.push({kolor:`hsl(${kolor},70%,7%)`,srodek:[y,x],promien:9})
+							const wielkosc=((planeta.wielkosc+3)*1.2)
+							elementy.push({kolorLini:`#111111`,grubosc:wielkosc,srodek:[100,100],promien:r,rozmycie:5})
+							//dodawanie oświetlonego kawałka planety:
+							elementy.push({kolor:`hsl(${planeta.kolor},100%,57%)`,srodek:[y-1,x-1],promien:wielkosc-0.5})
+							//dodawanie oświetlenia w kolorze słońca
+							elementy.push({kolor:`hsl(${60-Math.floor(Math.pow(12-zaznaczonyUklad.kolor,3)/28.8)},100%,57%)`,srodek:[y-1,x-1],promien:wielkosc-0.5,krycie:0.5})
+							//dodawanie planety
+							elementy.push({kolor:`hsl(${planeta.kolor},70%,7%)`,srodek:[y,x],promien:wielkosc})
 						}
 						setTimeout(()=>{rysuj(uklad,{d:700,h:700,elementy:elementy})},270)
 						setTimeout(()=>{ekran[1].ekran.nadajStan(1)},370)
@@ -751,10 +757,13 @@
 		{
 			const planeta={}
 			planeta.kat=[[[1.2,0.4,0.8,1,1.6,0.2,1.4],[0.6,0.4,1.6,1.4,1.8,0.8,1.2],[1.6,0.8,0.2,1.4,0,1,1.2],[1,1.6,0.4,0,0.6,0.8,1.8],[1.6,0.6,1.2,0,0.2,0.4,1],[1.4,1,1.2,0.8,0.2,1.8,0],[1.8,0,1.2,0.4,1.4,0.8,1.6]],[[1,0.8,0,0.2,1.4,0.4,1.2],[1,1.8,1.2,0,0.2,1.4,0.8],[0.6,0.2,1,1.6,1.4,1.2,1.8],[1,0.8,0.2,1.8,0,0.4,1.4],[1.8,0.6,1.4,1,0.4,1.6,0],[0.8,0.6,1.4,1.2,0.4,0,0.2],[1,0.2,0.4,1.6,1.4,1.8,0.8]],[[1.2,1.8,1.4,0,1,0.2,0.4],[1.4,1.6,1.8,0.6,0.8,0.2,1.2],[1.8,0.6,1.4,0.4,0.2,0.8,1],[0.4,1.8,0.8,0,1,1.2,0.6],[0,1,0.8,1.6,1.4,0.6,1.8],[0.2,0.6,0.8,1.8,1.6,0.4,0],[0.4,0.2,1.6,1.4,0.6,1.8,0]],[[1.4,1.8,1.2,0.6,0.8,0.2,0.4],[1.8,0.6,1.2,0.4,1,1.4,0.8],[0.4,0.2,1.2,1,1.4,1.8,0.6],[0.2,1.6,0,0.6,1.8,0.4,0.8],[0.8,1.4,0,1.6,1.8,1,0.2],[1.8,1.4,0,1.6,1,1.2,0.8],[0,0.8,0.4,1.4,1.6,1.2,0.2]]][((y%2)*2)+x%2][uklad.iloscPlanet-1][i]
-			//planeta.kat=(((i*9)+((y%3)*3)+x%3)%12)*0.17
+			planeta.wielkosc=Number("123413242143"[(y+i+uklad.iloscPlanet)%12])
+			planeta.dystans=80+[0,0,13,27,40][Number("132414234312"[(x+i+uklad.iloscPlanet)%12])]
+			planeta.kolor=Number("13524142531543212345"[(x+y+i+uklad.iloscPlanet)%20])*12
 			uklad.planety.push(planeta)
 		}
 		return uklad
+		13524142531543212345
 	}
 	function realnePolozenieUkladu(y,x,przesuniecie)
 	{
@@ -793,6 +802,21 @@
 		let l=Math.random()*((max-min)+1)
 		l+=min
 		return Math.floor(l)
+	}
+	function test()
+	{
+		const e="132414234312"
+		let max=0
+		for (let a=0 ; a<12 ; a++)
+		{
+			let w=0
+			for (let b=0 ; b<7 ; b++)
+			{
+				w+=[0,0,0.33,0.66,1][Number("132414234312"[(a+b)%12])]
+			}
+			max=Math.max(w,max)
+		}
+		console.log(max)
 	}
 </script>
 </head>
