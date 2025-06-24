@@ -1,0 +1,129 @@
+nav
+{
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+}
+footer
+{
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+}
+#nav, #footer
+{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	align-content: center;
+	width: 100%;
+	padding-left: 2vh;
+	padding-right: 2vh;
+	height: 5.5vh;
+}
+#nav
+{
+	border-bottom: solid 1vh;
+}
+#footer
+{
+	border-top: solid 1vh;
+}
+#nav header, #footer header
+{
+	font-size: 2.2vh;
+	letter-spacing: 0.2vh;
+	font-weight: bold;
+}
+.glue
+{
+	box-sizing: border-box;
+	min-height: 2vh;
+	min-width: 2vh;
+	border: solid 2vh rgba(0,0,0,0);
+}
+nav .glue, footer .glue
+{
+	position: relative;
+	width: 45vh;
+	height: 2vh;
+}
+nav .glue
+{
+	left: 2vh;
+	border-bottom: none;
+}
+footer .glue
+{
+	right: 2vh;
+	border-top: none;
+}
+.window
+{
+	position: fixed;
+	box-sizing: border-box;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	height: 70vh;
+	min-width: 40vh;
+	width: fit-content;
+	border: solid 0.4vh;
+	border-radius: 0.8vh;
+	padding: 0.4vh;
+}
+.window .glue
+{
+	position: absolute;
+	width: 2vh;
+	height: 50vh;
+	top: 10vh;
+}
+.window .glue.left
+{
+	left: -2vh;
+	border-left: none;
+}
+.window .glue.right
+{
+	right: -2vh;
+	border-right: none;
+}
+.window > div.content
+{
+	position: relative;
+	top: 50%;
+	transform: translate(0%, -50%);
+	min-width: 40vh;
+	height: 57vh;
+	overflow: auto;
+	padding: 0.5vh;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.window > div.content::-webkit-scrollbar
+{
+	display: none;
+}
+@media (max-width: 50vh)
+{
+	#nav, #footer
+	{
+		padding-left: 0.7vh;
+		padding-right: 0.7vh;
+	}
+	nav .glue
+	{
+		left: 0.7vh;
+		width: 35vh;
+	}
+	footer .glue
+	{
+		left: 0.7vh;
+		width: 35vh;
+	}
+}

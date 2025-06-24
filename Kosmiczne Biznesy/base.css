@@ -1,0 +1,51 @@
+*
+{
+	margin: 0;
+	padding: 0;
+	background-color: rgba(0,0,0,0);
+}
+body
+{
+	font-family: 'Rajdhani', sans-serif;
+	font-size: 1.7vh;
+	background-color: var(--background);
+	color: var(--base-text-color);
+}
+body > canvas
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	object-fit: cover;
+	display: block;
+}
+#moon
+{
+	position: fixed;
+	right: 8vh;
+	top: 18.5vh;
+	width: 7vh;
+	height: 7vh;
+	border-radius: 50%;
+	background-color: #9d9d89;
+	box-shadow: 0 0 30vh 4vh #9d9d89, 0 0 10vh 0vh #9d9d89, 0 0 0.5vh 0.5vh #9d9d89;
+}
+#scaffolding
+{
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(0,0,0,0);
+}
+.scaffold-strip
+{
+	position: absolute;
+	top: 0;
+	background: rgba(0,0,0,0);
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='240'><rect x='4' y='4' stroke-width='8' width='112' height='112' stroke='black' fill='none'/><polygon points='0,108 12,120 120,12 108,0' fill='black'/><rect x='4' y='124' stroke-width='8' width='112' height='112' stroke='black' fill='none'/><polygon points='0,132 108,240 120,228 12,120' fill='black'/></svg>");
+	height: 100vh;
+	background-repeat: repeat-y;
+	background-size: 100% auto;
+}

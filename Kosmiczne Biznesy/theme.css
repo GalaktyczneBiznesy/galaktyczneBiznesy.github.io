@@ -1,0 +1,56 @@
+:root
+{
+	--background: black;
+	--base-text-color: #F7E3B1;
+	--gray-color-1: #070707;
+	--gray-color-2: #111111;
+	--gray-color-3: #1b1b1b;
+	--sand-color-1: #39392F;
+	--sand-color-2: #b17f39;
+	--sand-color-3: #2f1b07;
+}
+#nav, #footer
+{
+	background: var(--sand-color-1);
+	border-color: var(--sand-color-2);
+}
+nav .glue
+{
+	border-top: solid 2vh var(--sand-color-2);;
+}
+footer .glue
+{
+	border-bottom: solid 2vh var(--sand-color-2);;
+}
+.window
+{
+	background-image: repeating-linear-gradient(
+		45deg,
+		var(--gray-color-2),
+		var(--gray-color-2) 1.2vh,
+		var(--sand-color-3) 1.2vh,
+		var(--sand-color-3) 2.4vh
+	);
+	background-size: 100% 100%;
+	border-color: var(--sand-color-3);
+	box-shadow: inset 0 0 0 0.4vh var(--gray-color-2);
+}
+.window .glue.left
+{
+	border-right: solid 2vh var(--sand-color-3);
+}
+.window .glue.right
+{
+	border-left: solid 2vh var(--sand-color-3);
+}
+.window > div.content
+{
+	background: var(--gray-color-2);
+}
+.bg-mosaic-solids
+{
+	background: black;
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='52' height='90'><polygon points='0,0 52,0 26,15' fill='%23150700'/><polygon points='0,90 52,90 26,75' fill='%23150700'/><polygon points='0,30 26,45 52,30 53,60 26,45 0,60' fill='%23150700'/><polygon points='0,0 26,15 26,45 52,60 52,90 26,75 26,45 0,30' fill='%23070000'/><polygon points='0,90 0,60 26,45 26,15 52,0 52,30 26,45 26,75' fill='%230E0300'/></svg>");
+	background-repeat: repeat;
+	background-size: 5vh auto;
+}
